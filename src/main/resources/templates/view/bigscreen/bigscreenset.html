@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/popUp.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/page.css"/>
+    <style type="text/css">
+        .table_operation span {
+            cursor: pointer
+        }
+
+        .welcome ul {
+            width: 280px;
+            height: 160px;
+            border-radius: 10px;
+        }
+
+        .welcome ul li img {
+            width: 280px;
+            height: 160px;
+            border-radius: 10px;
+        }
+
+        .welcome ul div {
+            background: rgba(0, 0, 0, 0.7);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<!--right-Sidebar-con-->
+<!--数据中心设置-->
+<div class="right-Sidebar-con border-box" id="over">
+    <article class="bgWhite relative" style="height: 100%;">
+        <div class="record-btn overflow textCenter f18px bgWhite">
+            <p class="current cursor" value="0">数据中心设置</p>
+            <p class="cursor" value="1">大屏欢迎页</p>
+            <p class="cursor" value="2">荣誉展示</p>
+        </div>
+        <nav class="set-time textCenter">
+            <ul class="inline-block">
+                <li>
+                    <label>轮播间隔：</label><span><input type="text" id="second" class="textCenter">s</span>
+                </li>
+                <li class="textLeft">
+                    <span class="lightGray f14px">轮播间隔时间不超过30秒</span>
+                </li>
+            </ul>
+            <div class="btn-bot textCenter pt30px pb30px">
+                <p class="inline-block textCenter overflow">
+                    <span class="bgBlue white" id="saveSecond">保存</span>
+                </p>
+            </div>
+        </nav>
+    </article>
+</div>
+
+
+<!--大屏欢迎页-->
+<div class="right-Sidebar-con border-box" style="display: none" id="over1">
+    <div class="record-btn overflow textCenter f18px bgWhite">
+        <p class="cursor" value="0">数据中心设置</p>
+        <p class="current cursor" value="1">大屏欢迎页</p>
+        <p class="cursor" value="2">荣誉展示</p>
+    </div>
+    <article class="bgWhite">
+        <div class="overflow pt15px pb15px pl30px pr30px lh40px border-bot">
+            <input type="file" id="show" class="hidden file"/>
+            <p class="f18px blue">
+                <sapn class="cursor" id="file1"><img src="../static/img/tianjia.png" style="width: 30px; vertical-align: -8px; margin-right: 5px;">添加大屏欢迎页</sapn>
+            </p>
+        </div>
+        <div class="add-per welcome overflow showData" id="welcome">
+
+        </div>
+        <div class="textCenter page-con">
+            <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page"></ul>
+        </div>
+    </article>
+</div>
+
+<!--荣誉展示-->
+<div class="right-Sidebar-con border-box" style="display: none" id="over2">
+    <div class="record-btn overflow textCenter f18px bgWhite">
+        <p class="cursor" value="0">数据中心设置</p>
+        <p class="cursor" value="1">大屏欢迎页</p>
+        <p class="current cursor" value="2">荣誉展示</p>
+    </div>
+    <article class="bgWhite">
+        <div class="overflow pt15px pb15px pl30px pr30px lh40px border-bot">
+            <input type="file" id="honour" class="hidden file"/>
+            <p class="f18px blue">
+                <span class="cursor" id="file2"><img src="../static/img/tianjia.png" style="width: 30px; vertical-align: -8px; margin-right: 5px;">添加荣誉展示的老干部</span>
+            </p>
+        </div>
+        <div class="add-per overflow showData">
+
+        </div>
+        <div class="textCenter page-con">
+            <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page2"></ul>
+        </div>
+    </article>
+</div>
+
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script src="../static/layer/layer.js"></script>
+<script src="../static/js/page.js"></script>
+<script>
+    var type = "";
+    $(function () {
+        $('.record-btn p').click(function () {
+            // $(this).addClass('current').siblings().removeClass('current');
+            var flag = $(this).attr("value");
+            if (flag == 0) {
+                $("#over").css("display", "");
+                $("#over1").css("display", "none");
+                $("#over2").css("display", "none");
+                type = flag;
+            } else if (flag == 1) {
+                $("#over").css("display", "none");
+                $("#over1").css("display", "");
+                $("#over2").css("display", "none");
+                type = flag;
+                getData(1);
+            } else if (flag == 2) {
+                $("#over").css("display", "none");
+                $("#over1").css("display", "none");
+                $("#over2").css("display", "");
+                type = flag;
+                getData(1);
+            }
+
+        });
+
+        loadSecond();
+
+        $("#saveSecond").click(function () {
+            updateSecond();
+        });
+
+
+        //图片上传1
+        $("#file1").click(function () {
+            $("#show").click();
+        });
+
+
+        $("#show").on("change", function () {
+            var file = $("#show").val();
+            if (!file.match(/.jpg|.gif|.png|.jpeg|.bmp/i)) {　　//判断上传文件格式
+                layer.open({
+                    content: '上传的图片格式不正确，请重新选择'
+                    , skin: 'msg'
+                    //,time: 2 //2秒后自动关闭
+                });
+                return;
+            }
+            var fileObj = this.files[0];
+            var data = new FormData();
+            data.append("file", fileObj);
+            data.append("type", type);
+            $.ajax({
+                url: "../bigscreen/upload",
+                type: "post",
+                data: data, //JSON.stringify({"file": file}),
+                dataType: "json",
+                // contentType: "application/json",
+                async: false,
+                processData: false,   //用FormData传fd时需有这两项     必要
+                contentType: false,
+                success: function (data) {
+                    if (data.code == 0000) {
+                        layer.alert(data.msg, function () {
+                            window.location.href = "../bigscreen/toBigscreenPage";
+                        })
+                    } else {
+                        layer.alert(data.msg)
+                    }
+                }
+            });
+        })
+
+        //图片上传2
+        $("#file2").click(function () {
+            $("#honour").click();
+        });
+
+        $("#honour").on("change", function () {
+            var file = $("#honour").val();
+            if (!file.match(/.jpg|.gif|.png|.jpeg|.bmp/i)) {　　//判断上传文件格式
+                layer.open({
+                    content: '上传的图片格式不正确，请重新选择'
+                    , skin: 'msg'
+                    //,time: 2 //2秒后自动关闭
+                });
+                return;
+            }
+            var fileObj = this.files[0];
+            var data = new FormData();
+            data.append("file", fileObj);
+            data.append("type", type);
+            $.ajax({
+                url: "../bigscreen/upload",
+                type: "post",
+                data: data, //JSON.stringify({"file": file}),
+                dataType: "json",
+                // contentType: "application/json",
+                async: false,
+                processData: false,   //用FormData传fd时需有这两项     必要
+                contentType: false,
+                success: function (data) {
+                    if (data.code == 0000) {
+                        layer.alert(data.msg, function () {
+                            window.location.href = "../bigscreen/toBigscreenPage";
+                        })
+                    } else {
+                        layer.alert(data.msg)
+                    }
+                }
+            });
+        })
+    });
+
+
+    function getData(page) {
+        var pageSize = 14;
+        var data = {currentPage: page, pageSize: pageSize, type: type};
+        $.ajax({
+            url: "../bigscreen/getBigscreenList",
+            type: "get",
+            async: false,
+            dataType: "json",
+            data: data,
+            success: function (result) {
+                var str = ""
+                if (result.code == 0000) {
+                    if (result.data.records.length > 0) {
+                        for (var i = 0; i < result.data.records.length; i++) {
+                            str += "<nav>";
+                            str += "<ul class=\"relative\">"
+                            str += "<li>"
+                            str += "<p><img src='" + result.data.records[i].imgUrl + "' class=\"block\"></p></li>";
+                            if (result.data.records[i].isExhibition == 2) {
+                                str += "<h1><img src=\"../static/img/qyjb.png\" class=\"block\"></h1>";
+                            }
+                            if (type == 2 && result.data.records[i].isExhibition == 1) {
+                                str += "<h1><img src=\"../static/img/tyjb.png\" class=\"block\"></h1>";
+                            }
+                            str += "<div class=\"textCenter\">";
+                            str += "<p>"
+                            //1不展示2展示
+                            if (result.data.records[i].isExhibition == 1) {
+                                str += "<span class=\"block mb15px\"><img onclick=\"showOrNotShow('" + result.data.records[i].id + "','2')\" src=\"../static/img/qy.png\"></span>"
+                            } else if (result.data.records[i].isExhibition == 2) {
+                                str += "<span class=\"block mb15px\"><img onclick=\"showOrNotShow('" + result.data.records[i].id + "','1')\" src=\"../static/img/ty.png\"></span>"
+                            }
+                            str += "<span class=\"block\"><img onclick=\"deleteById('" + result.data.records[i].id + "')\" src=\"../static/img/sc1.png\"></span>";
+                            str += "</p></div></ul></nav>";
+                        }
+                    } else {
+                        str += "暂无数据！";
+                    }
+                } else {
+                    str += result.data.msg;
+                }
+                $(".showData").html(str);
+                mouse();
+                $("#page").initPage(result.data.total, result.data.current, result.pages, getData, pageSize);
+                $("#page2").initPage(result.data.total, result.data.current, result.pages, getData, pageSize);
+            }
+        })
+    }
+
+    function loadSecond() {
+        $.ajax({
+            url: "../bigscreenInterval/getBigscreenInterval",
+            type: "get",
+            async: false,
+            dataType: "json",
+            success: function (result) {
+                if (result.code == 0000) {
+                    $("#second").val(result.data);
+                }
+            }
+        })
+    }
+
+    function updateSecond() {
+        var second = $("#second").val();
+        if (second > 30 || second < 3) {
+            layer.msg("轮播时间不能大于30s或小与3秒")
+            return;
+        }
+        var data = {second: second};
+        $.ajax({
+            url: "../bigscreenInterval/setBigscreenInterval",
+            type: "get",
+            async: false,
+            dataType: "json",
+            data: data,
+            success: function (result) {
+                if (result.code == 0000) {
+                    layer.msg(result.msg);
+                }
+            }
+        })
+    }
+
+    function deleteById(id) {
+        var data = {id: id};
+        layer.confirm('是否确认删除该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../bigscreen/deleteById",
+                type: "post",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1, type);
+                    }
+                }
+            })
+        });
+    }
+
+    function showOrNotShow(id, flag) {
+        var data = {id: id, flag: flag};
+        layer.confirm('确认修改该封面？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../bigscreen/showOrNotShow",
+                type: "post",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1, type);
+                    }
+                }
+            })
+        });
+    }
+
+    //鼠标悬停
+    function mouse() {
+        $('.add-per div').hide();
+        $('.add-per ul').on('mouseenter', function () {
+            $(this).children('div').fadeIn(300);
+        });
+
+        $('.add-per ul').on('mouseleave', function () {
+            $(this).children('div').fadeOut(300);
+        });
+    }
+
+</script>
+</body>
+</html>

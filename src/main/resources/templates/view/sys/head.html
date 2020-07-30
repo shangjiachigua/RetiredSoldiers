@@ -1,0 +1,13 @@
+<header th:fragment="head" class="head-town-con box-shadows relative pl40px pr40px">
+    <div class="blue logo-title textCenter fb overflow">
+        <img th:src="${#request.getContextPath()}+'/static/img/logo.png'" class="block left"><span class="ml20px left">徐汇军休中心信息管理系统</span>
+    </div>
+    <div class="head-right relative">
+        <p class="cursor">
+            <span><img th:src="${#request.getContextPath()}+'/static/img/zz.png'" class=""></span><span class="select-down">[[${userName}]]<em><img th:src="${#request.getContextPath()}+'/static/img/down_arrow.png'"></em></span>|<span id="loginOut">退出</span>
+        </p>
+        <ul class="select-ul textCenter lh40px cursor" hidden="hidden">
+            <li class="current" id="changePassword">修改密码</li>
+        </ul>
+    </div>
+</header>

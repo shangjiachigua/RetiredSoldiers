@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/popUp.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/page.css"/>
+    <style type="text/css">
+        .table_operation span {
+            cursor: pointer
+        }
+    </style>
+</head>
+<body>
+<!--<input id="initPage" th:value="${initPage}" type="hidden">-->
+<div class="right-Sidebar-con border-box">
+    <div>
+        <!-- <p class="btn-inquire mb20px table_operation">
+             <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" id="addInformation">新建</span>
+         <p><label>分类：</label></p>
+         <p>
+             <select class="form-control form-select" id="type">
+
+             </select>
+         </p>
+
+
+        &lt;!&ndash; <select id="type">
+             <option>请选择</option>
+             <option>活动室</option>
+         </select>&ndash;&gt;
+         <input type="text" placeholder="请输入标题" id="title"><input type="button" value="查询" id="searchButton">
+         </p>-->
+
+        <div class="form-inline form-group-search pt20px pb20px pr30px">
+            <p class="form-group btn-inquire table_operation">
+                <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" id="addInformation">新建</span>
+            </p>
+            <p class="form-group">
+                <select class="form-control form-select" id="type" style="width: 300px">
+
+                </select>
+            </p>
+            <p class="relative form-group form-group-width">
+                <input type="text" class="form-control" id="title" name="name" placeholder="请输入标题">
+                <span class="glyphicon glyphicon-search form-control-feedback lightGray" style="top:3px; left: 0;"></span>
+            </p>
+            <p class="relative form-group ml20px">
+                <span class="block bgBlue white border-radius5 pl30px pr30px lh40px cursor" id="searchButton">搜  索</span>
+            </p>
+        </div>
+
+        <div class="table-con bgWhite border_box border-radius5">
+            <table cellpadding="0" cellspacing="0" width="100%" border="0" class="textCenter" id="main_table">
+                <thead>
+                <tr>
+                    <th style="width: 10%">序号</th>
+                    <th style="width: 20%">标题</th>
+                    <th style="width: 15%">分类</th>
+                    <th style="width: 10%">上传者</th>
+                    <th style="width: 25%">创建时间</th>
+                    <th style="width: 20%">操作</th>
+                </tr>
+                </thead>
+                <tbody id="value">
+
+                </tbody>
+            </table>
+            <div class="textCenter page-con">
+                <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script src="../static/layer/layer.js"></script>
+<script src="../static/js/page.js"></script>
+<script src="../static/validation/jquery.validate.js"></script>
+
+<script>
+
+    $(function () {
+
+        //加载资料类型
+        getInfromationType();
+
+        getData(1);
+
+
+        $("#addInformation").click(function () {
+            window.location.href = "../information/toAddInformation";
+        });
+
+        $("#searchButton").click(function () {
+            getData(1);
+        });
+
+    });
+
+    function getInfromationType() {
+        $.ajax({
+            url: "../informationType/getInformationType",
+            type: "get",
+            async: false,
+            dataType: "json",
+            success: function (result) {
+                if (result.code == 200) {
+                    var str = "<option value=''>请选择</option>";
+                    if (result.data.length > 0) {
+                        for (var i = 0; i < result.data.length; i++) {
+                            str += "<option value='" + result.data[i].id + "'>" + result.data[i].name + "</option>"
+                        }
+                    } else {
+                        str = "";
+                    }
+                }
+                $("#type").html(str);
+            }
+        })
+    }
+
+    function getData(page) {
+        var title = $("#title").val();
+        var type = $("#type").val()
+        var pageSize = 15;
+        var data = {currentPage: page, pageSize: pageSize, title: title, type: type};
+        $.ajax({
+            url: "../information/getInformation",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (result) {
+                var html = "";
+                if (result.code == 200) {
+                    if (result.data.records.length > 0) {
+                        var orderNum = (result.data.current - 1) * pageSize
+                        for (var i = 0; i < result.data.records.length; i++) {
+                            html += "<tr>";
+                            html += "<td>" + (orderNum + i + 1) + "</td>";
+                            html += "<td>" + result.data.records[i].title + "</td>"
+                            html += "<td>" + result.data.records[i].type + "</td>"
+                            html += "<td>" + result.data.records[i].createBy + "</td>"
+                            html += "<td>" + result.data.records[i].createTime + "</td>"
+                            html += "<td><p class=\"delete-img\"><span class=\"mr15px\"><span class=\"mr15px\" onclick=\"editDataById('" + result.data.records[i].id + "')\"><img src=\"../static/img/bianji.png\"></span><span class='delete' onclick=\"deleteDataById('" + result.data.records[i].id + "')\"><img src=\"../static/img/shanchu.png\"></span></p></td>"
+                            html += "</tr>"
+                        }
+                    } else {
+                        html += "<tr><td colspan='5'>暂无数据信息！</td></tr>";
+                    }
+                } else {
+                    html += "<tr><td colspan='5'>获取列表失败！</td></tr>";
+                }
+                $("#value").html(html);
+                $("#page").initPage(result.data.total, result.data.current, result.data.pages, getData, pageSize);
+            }
+        })
+    }
+
+    function editDataById(id) {
+        window.location.href = "../information/toAddInformation?id=" + id;
+    }
+
+
+    function deleteDataById(id) {
+        var data = {id: id};
+        layer.confirm('是否确认删除该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../information/deleteById",
+                type: "post",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1);
+                    }
+                }
+            })
+        });
+
+    }
+
+</script>
+</body>
+</html>

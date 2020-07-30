@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/headCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/leftSidebar.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <style type="text/css">
+    </style>
+</head>
+<body>
+
+<div id="mutex" class="right-Sidebar-con border-box" style="display: none">
+    <div class="box-shadows border-radius5 bgWhite add" style="padding:30px; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);">
+        <p><img src="../static/img/file.jpg" class="border-radius5"><span class="lightGray f18px ml30px">添加军休中心介绍内容</span></p>
+    </div>
+</div>
+
+<div id="mutex2" class="right-Sidebar-con border-box" style="display: none">
+    <div class="record-compile-con">
+        <div class="bgWhite border-radius5 box-shadows mb5px overflow">
+            <span class="left pad20" style="border-right: 3px solid #F0EFF5; height: 65px;"></span>
+            <span class="left pad20 f18px fb">军休所介绍</span>
+        </div>
+        <div class="bgWhite border-radius5 box-shadows mb20px">
+            <input type="hidden" id="id" value="">
+            <div style="width: 60%; margin: 0 auto; padding: 20px;" id="content">
+                <!--   <dl class="intro-con">
+                       <dt><img src="img/tp.jpg"></dt>
+                       <dd class="f18px fb">上海市徐汇区退役军人军休所</dd>
+                       <dd><img src="img/shanchu.png"><span class="lightGray f14px">上海市徐汇区退役军人军休所，是上海市徐汇区机构改革新组建的单位。</span></dd>
+                       <dd>2019年10月10日下午，徐汇区退役军人军休所、徐汇区区级机关工作党委、徐汇区民政局与杨浦区退役军人军休所共同组织了“不忘初心、牢记使命”主题教育党员联组学习，以参观杨浦区国歌展示馆为主题，围绕“宗旨性质”专题开展学习交流。</dd>
+                       <dd>国歌纪念广场和国歌展示馆是全国首座以纪念中华人民共和国国歌为主题的纪念广场和展示馆，于新中国成立60周年前夕建成并对外开放。参观过程中，全体党员从国歌纪念广场步行走进国歌展示馆参观。国歌主题展分为“民族危亡的怒吼声”“时代呼唤的最强音”“民族解放的冲锋号”“强我中华的进行曲”“伟大复兴的主旋律”五个篇章。在一件件历史文物和一段段历史影像前，大家驻足观看，仔细听取介绍，不时交流讨论。</dd>
+                       <dd>此次参观活动让党员们深切感受到了中华民族的伟大不屈精神以及众志成城的决心与力量。《义勇军进行曲》是近代中华民族独立解放的战斗号角，深深溶入中国人民的血液，化为中华民族的灵魂。这首歌伴随中国人民赢得国家独立、人民解放，建立新中国，取得社会主义现代化建设，特别是改革开放的伟大成就。</dd>
+                   </dl>-->
+            </div>
+        </div>
+        <div class="btn-bot textCenter pt30px pb30px">
+            <p class="inline-block textCenter overflow">
+                <span class="bgBlue white mr30px" id="update">编辑</span><span class="bgGray" id="delete">删除</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script src="../static/layer/layer.js"></script>
+<script>
+    $(function () {
+
+        loadData();
+
+        $(".add").click(function () {
+            window.location.href = "../introduction/toAddPage";
+        })
+
+        $("#update").click(function () {
+            var id = $("#id").val();
+            window.location.href = "../introduction/toAddPage?id=" + id;
+        })
+
+        $("#delete").click(function () {
+            layer.confirm('是否确认删除该信息？', {
+                btn: ['确定', '取消']
+            }, function () {
+                layer.closeAll();
+                deleteById();
+            });
+        })
+
+    });
+
+    function loadData() {
+        $.ajax({
+            url: "../introduction/getIntroduction",
+            type: "get",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.code == 200 && data.msg == "成功") {
+                    // console.info(data.data.content);
+                    $("#content").html(data.data.content);
+                    $("#id").val(data.data.id);
+                    $("#mutex").css("display", "none");
+                    $("#mutex2").css("display", "");
+                } else if (data.code == 9997 && data.msg == "未找到") {
+                    $("#mutex").css("display", "");
+                    $("#mutex2").css("display", "none");
+                } else {
+                    $("#content").html(data.msg);
+                }
+            }
+        })
+    }
+
+    function deleteById() {
+        var id = $("#id").val();
+        var data = {id: id}
+        $.ajax({
+            url: "../introduction/deleteById",
+            type: "get",
+            data: data,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.code == 0000 && data.msg == "成功") {
+                    $("#mutex").css("display", "");
+                    $("#mutex2").css("display", "none");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>
+

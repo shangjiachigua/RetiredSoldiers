@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/popUp.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/page.css"/>
+    <style type="text/css">
+        .table_operation span {
+            cursor: pointer
+        }
+    </style>
+</head>
+<body>
+
+<!--right-Sidebar-con-->
+<div class="right-Sidebar-con border-box">
+    <div class="record-btn overflow textCenter f18px bgWhite">
+        <p class="cursor current" value="1">正常</p>
+        <p class="cursor" value="0">待发布</p>
+        <p class="cursor" value="8">已过期</p>
+        <p class="cursor" value="9">已删除</p>
+    </div>
+    <article class="bgWhite">
+        <div class="overflow pt15px pb15px pl30px pr30px lh40px">
+            <p class="left f18px">活动管理</p>
+            <p class="right bgBlue white border-radius5 pl20px pr20px" id="addActivity">活动添加</p>
+        </div>
+        <div class="form-inline form-group-search pt20px pb20px pl30px pr30px">
+            <p class="relative form-group form-group-width">
+                <input type="text" class="form-control" id="title" name="name" placeholder="活动名称">
+                <span class="glyphicon glyphicon-search form-control-feedback lightGray" style="top:3px; left: 0;"></span>
+            </p>
+            <p class="relative form-group ml20px">
+                <span class="block bgBlue white border-radius5 pl30px pr30px lh40px" id="searchBtn">搜  索</span>
+            </p>
+        </div>
+        <div class="active-normal" id="value">
+
+        </div>
+        <div class="textCenter page-con">
+            <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page"></ul>
+        </div>
+    </article>
+</div>
+
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script src="../static/layer/layer.js"></script>
+<script src="../static/js/page.js"></script>
+<script src="../static/validation/jquery.validate.js"></script>
+<script>
+    var controlStatus = '1';
+    $(function () {
+        getData(1);
+
+        $('.record-btn p').click(function () {
+            $(this).addClass('current').siblings().removeClass('current');
+            var status = $(this).attr("value");
+            controlStatus = status
+            getData(1);
+        });
+
+        $("#searchBtn").click(function () {
+            var status = $('.record-btn p.current').attr("value");
+            controlStatus = status
+            getData(1);
+        });
+
+        $("#addActivity").click(function () {
+            window.location.href = "../activity/toAddActivity"
+        })
+
+    });
+
+    function getData(page) {
+        var title = $("#title").val();
+        var pageSize = 9;
+        var data = {currentPage: page, pageSize: pageSize, title: title, status: controlStatus};
+        $.ajax({
+            url: "../activity/getActivityList",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (result) {
+                var html = "";
+                if (result.code == 200) {
+                    if (result.data.list.length > 0) {
+                        for (var i = 0; i < result.data.list.length; i++) {
+                            html += "<div>";
+                            html += "<dl><dd class=\"overflow border-bot pb15px\">";
+                            if (controlStatus == 1) {
+                                html += "<p onclick=\"personInfo('" + result.data.list[i].id + "')\" class=\"darkGray left cursor\">报名人员信息</p>"
+                                html += "<p class=\"right\"><span class=\"red\">" + result.data.list[i].recruitsCountNumber + "</span>/" + result.data.list[i].recruitsNumber + "</p></dd>";
+                            }
+                            html += "<dd class=\"fb f18px mt15px mb15px\">" + result.data.list[i].title + "</dd>";
+                            html += "<dt onclick=\"activityInfo('" + result.data.list[i].id + "')\"><p style=\"background-image: url(" + result.data.list[i].imgUrl + ");\" class=\"smallimg\"></p></dt>"
+                            html += "<dd class=\"pt15px pb15px\">" + result.data.list[i].activityDescribe + "</dd>";
+                            if (controlStatus == 1) {
+                                html += "<dd>";
+                                html += "<ul><li><img onclick=\"cancelPub('" + result.data.list[i].id + "')\" src=\"../static/img/qxfb.png\"></li><li><img onclick=\"deleteAcById('" + result.data.list[i].id + "')\" src=\"../static/img/shanchu.png\"></li></ul>"
+                                html += "</dd>"
+                            } else if (controlStatus == 0) {
+                                html += "<dd>";
+                                html += "<ul><li><img onclick=\"editData('" + result.data.list[i].id + "')\" src=\"../static/img/bianji.png\"></li><li><img onclick=\"publish('" + result.data.list[i].id + "')\" src=\"../static/img/fb.png\"></li><li><img onclick=\"deleteAcById('" + result.data.list[i].id + "')\" src=\"../static/img/shanchu.png\"></li></ul>"
+                                html += "</dd>"
+                            }
+                            html += "</dl></div>"
+                        }
+                    } else {
+                        html += "<tr><td colspan='5'>暂无数据信息！</td></tr>";
+                    }
+                } else {
+                    html += "<tr><td colspan='5'>获取字典列表失败！</td></tr>";
+                }
+                $("#value").html(html);
+                $("#page").initPage(result.data.total, result.data.pageNum, result.data.pages, getData, pageSize);
+            }
+        })
+    }
+
+    //取消发布
+    function cancelPub(id) {
+        var data = {id: id};
+        layer.confirm('是否确认取消发布该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../activity/cancelPublish",
+                type: "get",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1);
+                    } else {
+                        layer.msg(result.msg);
+                    }
+                }
+            })
+        });
+    }
+
+    //发布
+    function publish(id) {
+        var data = {id: id};
+        layer.confirm('是否确认发布该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../activity/publish",
+                type: "get",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1);
+                    } else {
+                        layer.msg(result.msg);
+                    }
+                }
+            })
+        });
+    }
+
+    //根据id删除
+    function deleteAcById(id) {
+        var data = {id: id};
+        layer.confirm('是否确认删除该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../activity/deleteById",
+                type: "get",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        var type = $(".record-btn p.current").attr("value");
+                        getData(1);
+                    } else {
+                        layer.msg(result.msg);
+                    }
+                }
+            })
+        });
+    }
+
+    //根据id修改
+    function editData(id) {
+        window.location.href = "../activity/toAddActivity?id=" + id;
+    }
+
+    //跳转活动预览页
+    function activityInfo(id) {
+        window.location.href = "../activity/toActivityInfo?id=" + id;
+    }
+
+    //跳转参与人员详情页
+    function personInfo(id) {
+        window.location.href = "../activity/toPersonInfo?id=" + id;
+    }
+
+
+</script>
+</body>
+</html>

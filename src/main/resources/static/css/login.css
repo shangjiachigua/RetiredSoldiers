@@ -1,0 +1,42 @@
+html,body{ min-width:1200px; height:100%; background:url(../img/DLBJ.png) no-repeat left center; background-size:100% 100%}
+input,textarea,select,option{ outline: none; }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type="number"]{
+    -moz-appearance: textfield;
+}
+.blue{ color:#356aff}
+.bgBlue{ background-color:#356aff}
+
+.login{ 
+	position: relative;
+	position:absolute;
+	width:1080px;
+	left:50%;
+	top:50%;
+	transform: translate(-50%,-50%);
+	
+}
+.login{ display: flex; }
+.login div{ flex: 1; padding: 80px;}
+.login div:nth-child(1){ 
+	background:rgba(0,0,0,0.5);
+}
+.login div:nth-child(1) dl{ 
+	width: 100%;
+	position:absolute;
+	left:50%;
+	top:50%;
+	transform: translate(-50%,-50%);
+}
+.login div:nth-child(1) dl dt img{ width: 220px; border-radius: 50%; }
+.login div:nth-child(1) dl dd{ font-size: 35px; letter-spacing: 2px; color:#356aff }
+.login h1{ font-size:36px; letter-spacing: 5px; color:#323232 }
+.login li{ background-color: #eee; border:1px solid #E5E5E5; border-radius:5px; padding: 15px 10px; line-height: 30px; margin:40px 0; font-size:18px; }
+.login li input{ padding-left: 50px; }
+.login li:nth-of-type(1) input{ background:url(../img/zhanghao.png) no-repeat left 10px center; background-size:20px;}
+.login li:nth-of-type(2) input{ background:url(../img/mima.png) no-repeat left 10px center; background-size:20px;}
+.login li input{ width:100%; box-sizing: border-box; }
+.login p span{ background-color:#356aff; letter-spacing: 5px;}

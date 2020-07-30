@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caifu.mapper.JxArchivesFamilymembersMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caifu.pojo.JxArchivesFamilymembers">
+        <id column="ID" property="id" />
+        <result column="ARCHIVES_ID" property="archivesId" />
+        <result column="NAME" property="name" />
+        <result column="RELATION" property="relation" />
+        <result column="CONTACT" property="contact" />
+        <result column="URGENT_CONTACT" property="urgentContact" />
+        <result column="STATUS" property="status" />
+    </resultMap>
+
+</mapper>

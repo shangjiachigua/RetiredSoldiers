@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caifu.mapper.JxArchivesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caifu.pojo.JxArchives">
+        <id column="ID" property="id" />
+        <result column="CREATE_BY" property="createBy" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="UPDATE_BY" property="updateBy" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="NAME" property="name" />
+        <result column="CERTIFICATE_NUMBER" property="certificateNumber" />
+        <result column="SEX" property="sex" />
+        <result column="BIRTH_DATE" property="birthDate" />
+        <result column="TYPE" property="type" />
+        <result column="BRANCH" property="branch" />
+        <result column="NATIVE_PLACE" property="nativePlace" />
+        <result column="NATION" property="nation" />
+        <result column="EDUCATIONAL_LEVEL" property="educationalLevel" />
+        <result column="POLITICAL_AFFILIATION" property="politicalAffiliation" />
+        <result column="JOINPARTY_DATE" property="joinpartyDate" />
+        <result column="MARITAL_STATUS" property="maritalStatus" />
+        <result column="HOUSEHOLD_REGISTRATION" property="householdRegistration" />
+        <result column="RESIDE_ADDRESS" property="resideAddress" />
+        <result column="PHONE_NUMBER" property="phoneNumber" />
+        <result column="TEL_NUMBER" property="telNumber" />
+        <result column="ALIVE_STATUS" property="aliveStatus" />
+        <result column="DEATH_DATE" property="deathDate" />
+        <result column="INVALIDISM_COMMUNAL" property="invalidismCommunal" />
+        <result column="INVALIDISM_COMMUNAL_LEVEL" property="invalidismCommunalLevel" />
+        <result column="INVALIDISM_ILLNESS" property="invalidismIllness" />
+        <result column="INVALIDISM_ILLNESS_LEVEL" property="invalidismIllnessLevel" />
+        <result column="INVALIDISM_WARFARE" property="invalidismWarfare" />
+        <result column="INVALIDISM_WARFARE_LEVEL" property="invalidismWarfareLevel" />
+        <result column="SERIOUS_DISEASE" property="seriousDisease" />
+        <result column="JOINUP_DATE" property="joinupDate" />
+        <result column="START_WORK_DATE" property="startWorkDate" />
+        <result column="END_WORK_DATE" property="endWorkDate" />
+        <result column="RECEIVE_DATE" property="receiveDate" />
+        <result column="TROOPS_DUTIES" property="troopsDuties" />
+        <result column="TROOPS_TYPE" property="troopsType" />
+        <result column="CADER_TYPE" property="caderType" />
+        <result column="MILITARY_RANK" property="militaryRank" />
+        <result column="SKILL_LEVEL" property="skillLevel" />
+        <result column="DUTIES_LEVEL" property="dutiesLevel" />
+        <result column="NOW_TREATMENT" property="nowTreatment" />
+        <result column="SPECIAL_SUBSIDY" property="specialSubsidy" />
+        <result column="NURSING_EXPENSES" property="nursingExpenses" />
+        <result column="NURSE_START_DATE" property="nurseStartDate" />
+        <result column="LONGTERM_INSURANCE" property="longtermInsurance" />
+        <result column="FAMILY_DOCTOR" property="familyDoctor" />
+        <result column="PURCHASE_JJGA" property="purchaseJjga" />
+        <result column="PURCHASE_AKT" property="purchaseAkt" />
+        <result column="REMARKS" property="remarks" />
+        <result column="STATUS" property="status" />
+        <result column="PHOTO_URL" property="photoUrl" />
+        <result column="FACE_STATE" property="faceState" />
+        <result column="FACE_ID" property="faceId" />
+    </resultMap>
+
+    <select id="getArchivesList" resultType="java.util.HashMap">
+        select t.id,t.name,t.type,t.branch,t.sex,date_format(birth_date,'%Y-%m-%d') as birth_date,t.troops_type,t.cader_type,t.now_treatment,t.political_affiliation from (select a.create_time,a.id,a.name,a.type,b.name as branch,a.sex,a.birth_date,e.name as troops_type,c.name as
+        cader_type,d.name as now_treatment,a.political_affiliation
+        <if test="liGong != null and liGong != ''">,case when exists( select 1 from jx_archives_contribution lg where
+            a.id = lg.archives_id and lg.
+            contribution_level = #{liGong} ) then 1 else 0 end as lg_level
+        </if>
+        <if test="canZhan != null and canZhan != ''">
+            ,case when exists( select 1 from jx_archives_warfare cz where a.id = cz.archives_id and cz.warfare = #{
+            canZhan} ) then 1 else 0 end as cz
+        </if>
+        from jx_archives a left join p_dictionaries_value b on a.branch = b.id left join p_dictionaries_value c on a.
+        cader_type = c.id left join p_dictionaries_value d on a.now_treatment = d.id left join p_dictionaries_value e on a.troops_type = e.id where a.status = '1'
+        <if test="archives.name != null and archives.name != ''">
+            and a.name like concat('%',#{archives.name()},'%')
+        </if>
+        <if test="archives.branch != null and archives.branch != ''">
+            and a.branch = #{archives.branch}
+        </if>
+        <if test="archives.sex != null and archives.sex != ''">
+            and a.sex = #{archives.sex}
+        </if>
+        <if test="archives.nation != null and archives.nation != ''">
+            and a.nation = #{archives.nation}
+        </if>
+        <if test="archives.maritalStatus != null and archives.maritalStatus != ''">
+            and a.marital_status = #{archives.maritalStatus}
+        </if>
+        <if test="archives.invalidismIllnessLevel != null and archives.invalidismIllnessLevel != ''">
+            and a.invalidism_illness_level = #{archives.invalidismIllnessLevel}
+        </if>
+        <if test="archives.invalidismWarfareLevel != null and archives.invalidismWarfareLevel != ''">
+            and a.invalidism_warfare_level = #{archives.invalidismWarfareLevel}
+        </if>
+        <if test="archives.invalidismCommunalLevel != null and archives.invalidismCommunalLevel != ''">
+            and a.invalidism_communal_level = #{archives.invalidismCommunalLevel}
+        </if>
+        <if test="archives.troopsType != null and archives.troopsType != ''">
+            and a.troops_type = #{archives.troopsType}
+        </if>
+        <if test="archives.caderType != null and archives.caderType != ''">
+            and a.cader_type = #{archives.caderType}
+        </if>
+        <if test="archives.skillLevel != null and archives.skillLevel != ''">
+            and a.skill_level = #{archives.skillLevel}
+        </if>
+        <if test="archives.dutiesLevel != null and archives.dutiesLevel != ''">
+            and a.duties_level = #{archives.dutiesLevel}
+        </if>
+        <if test="archives.nowTreatment != null and archives.nowTreatment != ''">
+            and a.now_treatment = #{archives.nowTreatment}
+        </if>
+        <if test="archives.specialSubsidy != null and archives.specialSubsidy != ''">
+            and a.special_subsidy = #{archives.specialSubsidy}
+        </if>
+        <if test="archives.nursingExpenses != null and archives.nursingExpenses != ''">
+            and a.nursing_expenses = #{archives.nursingExpenses}
+        </if>
+        <if test="archives.longtermInsurance != null and archives.longtermInsurance != ''">
+            and a.longterm_insurance = #{archives.longtermInsurance}
+        </if>
+        <if test="archives.familyDoctor != null and archives.familyDoctor != ''">
+            and a.family_doctor = #{archives.familyDoctor}
+        </if>
+        <if test="archives.purchaseJjga != null and archives.purchaseJjga != ''">
+            and a.purchase_jjga = #{archives.purchaseJjga}
+        </if>
+        <if test="archives.purchaseAkt != null and archives.purchaseAkt != ''">
+            and a.purchase_akt = #{archives.purchaseAkt}
+        </if>
+        <if test="minAge != null and minAge != ''">
+            and date(a.birth_date) &gt;= #{minAge}
+        </if>
+        <if test="maxAge != null and maxAge != ''">
+            and date(a.birth_date) &lt;= #{maxAge}
+        </if>
+        <if test="minRwsj != null and minRwsj != ''">
+            and year(a.joinup_date) &gt;= #{minRwsj}
+        </if>
+        <if test="maxRwsj != null and maxRwsj != ''">
+            and year(a.joinup_date) &lt;= #{minRwsj}
+        </if>
+        <if test="minCjgzsj != null and minCjgzsj != ''">
+            and year(a.start_work_date) &gt;= #{minCjgzsj}
+        </if>
+        <if test="maxCjgzsj != null and maxCjgzsj != ''">
+            and year(a.start_work_date) &lt;= #{maxCjgzsj}
+        </if>
+        <if test="minJssj != null and minJssj != ''">
+            and year(a.receive_date) &gt;= #{minJssj}
+        </if>
+        <if test="maxJssj != null and maxJssj != ''">
+            and year(a.receive_date) &lt;= #{maxJssj}
+        </if>
+        )t where 1 = 1
+        <if test="liGong != null and liGong != ''">
+            and t.lg_level = 1
+        </if>
+        <if test="canZhan != null and canZhan != ''">
+            and t.cz = 1
+        </if>
+        order by t.create_time,t.id limit ${minCount},${pageSize}
+    </select>
+
+
+    <select id="getArchivesListCount" resultType="java.lang.Integer">
+        select count(*) from (select a.id
+        <if test="liGong != null and liGong != ''">
+            ,case when exists( select 1 from jx_archives_contribution lg where a.id = lg.archives_id and
+            lg.contribution_level = #{liGong} ) then 1 else 0 end as lg_level
+        </if>
+        <if test="canZhan != null and canZhan != ''">
+            ,case when exists( select 1 from jx_archives_warfare cz where a.id = cz.archives_id and cz.warfare =
+            #{canZhan} ) then 1 else 0 end as cz
+        </if>
+        from jx_archives a left join p_dictionaries_value b on a.branch = b.id left join p_dictionaries_value c on
+        a.cader_type = c.id left join p_dictionaries_value d on a.now_treatment = d.id where a.status = '1'
+        <if test="archives.name != null and archives.name != ''">
+            and a.name like concat('%',#{archives.name()},'%')
+        </if>
+        <if test="archives.branch != null and archives.branch != ''">
+            and a.branch = #{archives.branch}
+        </if>
+        <if test="archives.sex != null and archives.sex != ''">
+            and a.sex = #{archives.sex}
+        </if>
+        <if test="archives.nation != null and archives.nation != ''">
+            and a.nation = #{archives.nation}
+        </if>
+        <if test="archives.maritalStatus != null and archives.maritalStatus != ''">
+            and a.marital_status = #{archives.maritalStatus}
+        </if>
+        <if test="archives.invalidismIllnessLevel != null and archives.invalidismIllnessLevel != ''">
+            and a.invalidism_illness_level = #{archives.invalidismIllnessLevel}
+        </if>
+        <if test="archives.invalidismWarfareLevel != null and archives.invalidismWarfareLevel != ''">
+            and a.invalidism_warfare_level = #{archives.invalidismWarfareLevel}
+        </if>
+        <if test="archives.invalidismCommunalLevel != null and archives.invalidismCommunalLevel != ''">
+            and a.invalidism_communal_level = #{archives.invalidismCommunalLevel}
+        </if>
+        <if test="archives.troopsType != null and archives.troopsType != ''">
+            and a.troops_type = #{archives.troopsType}
+        </if>
+        <if test="archives.caderType != null and archives.caderType != ''">
+            and a.cader_type = #{archives.caderType}
+        </if>
+        <if test="archives.skillLevel != null and archives.skillLevel != ''">
+            and a.skill_level = #{archives.skillLevel}
+        </if>
+        <if test="archives.dutiesLevel != null and archives.dutiesLevel != ''">
+            and a.duties_level = #{archives.dutiesLevel}
+        </if>
+        <if test="archives.nowTreatment != null and archives.nowTreatment != ''">
+            and a.now_treatment = #{archives.nowTreatment}
+        </if>
+        <if test="archives.specialSubsidy != null and archives.specialSubsidy != ''">
+            and a.special_subsidy = #{archives.specialSubsidy}
+        </if>
+        <if test="archives.nursingExpenses != null and archives.nursingExpenses != ''">
+            and a.nursing_expenses = #{archives.nursingExpenses}
+        </if>
+        <if test="archives.longtermInsurance != null and archives.longtermInsurance != ''">
+            and a.longterm_insurance = #{archives.longtermInsurance}
+        </if>
+        <if test="archives.familyDoctor != null and archives.familyDoctor != ''">
+            and a.family_doctor = #{archives.familyDoctor}
+        </if>
+        <if test="archives.purchaseJjga != null and archives.purchaseJjga != ''">
+            and a.purchase_jjga = #{archives.purchaseJjga}
+        </if>
+        <if test="archives.purchaseAkt != null and archives.purchaseAkt != ''">
+            and a.purchase_akt = #{archives.purchaseAkt}
+        </if>
+        <if test="minAge != null and minAge != ''">
+            and date(a.birth_date) &gt;= #{minAge}
+        </if>
+        <if test="maxAge != null and maxAge != ''">
+            and date(a.birth_date) &lt;= #{maxAge}
+        </if>
+        <if test="minRwsj != null and minRwsj != ''">
+            and year(a.joinup_date) &gt;= #{minRwsj}
+        </if>
+        <if test="maxRwsj != null and maxRwsj != ''">
+            and year(a.joinup_date) &lt;= #{minRwsj}
+        </if>
+        <if test="minCjgzsj != null and minCjgzsj != ''">
+            and year(a.start_work_date) &gt;= #{minCjgzsj}
+        </if>
+        <if test="maxCjgzsj != null and maxCjgzsj != ''">
+            and year(a.start_work_date) &lt;= #{maxCjgzsj}
+        </if>
+        <if test="minJssj != null and minJssj != ''">
+            and year(a.receive_date) &gt;= #{minJssj}
+        </if>
+        <if test="maxJssj != null and maxJssj != ''">
+            and year(a.receive_date) &lt;= #{maxJssj}
+        </if>
+        ) t where 1 = 1
+        <if test="liGong != null and liGong != ''">
+            and t.lg_level = 1
+        </if>
+        <if test="canZhan != null and canZhan != ''">
+            and t.cz = 1
+        </if>
+    </select>
+
+</mapper>

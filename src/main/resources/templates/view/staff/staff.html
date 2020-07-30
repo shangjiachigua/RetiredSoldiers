@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/popUp.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/page.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/lc_switch.css"/>
+    <style type="text/css">
+        .table_operation span {
+            cursor: pointer
+        }
+    </style>
+</head>
+<body>
+<!--right-Sidebar-con-->
+<input id="id" type="hidden" th:value="${id}"/>
+<div class="right-Sidebar-con border-box">
+    <article class="bgWhite">
+        <div class="overflow pt15px pb15px pl30px pr30px lh40px border-bot">
+            <p class="left f18px">员工管理</p>
+            <p class="right bgBlue white border-radius5 pl20px pr20px" id="add">新建</p>
+        </div>
+        <div class="staff-con overflow" id="value">
+            <!--<div>
+                <dl class="relative">
+                    <dt><img src="../static/img/tx.png" class="border-radius5"></dt>
+                    <dd>
+                        <p class="overflow"><span class="compile-btn right pl10px"><img src="../static/img/cz.png"></span></p>
+                        <p><span class="f18px fb">大屏显示中</span></p>
+                        <p><span class="blue inline-block lh30px pl15px pr15px border-radius3">大屏显示中</span></p>
+                        <p><span class="lightGray">创建于2019-03-12</span></p>
+                    </dd>
+                    <div class="compile textCenter lh35px cursor f14px">
+                        <span class="block">编辑</span>
+                        <span class="block">删除</span>
+                    </div>
+                </dl>
+            </div>-->
+        </div>
+        <div class="textCenter page-con">
+            <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page"></ul>
+        </div>
+    </article>
+</div>
+
+//弹层
+<div class="popUp" id="layerOpen">
+    <ul class="pop-ul textCenter f18px fb relative">
+        <li><span>添加员工</span></li>
+        <p><span class="close-btn"><img src="../static/img/close.png"></span></p>
+    </ul>
+    <div class="form-con">
+        <form class="form-horizontal" role="form">
+            <div class="form-group row">
+                <label class="col-sm-4 control-label">照片</label>
+                <div class="col-sm-8" id="image">
+                    <p>
+                        <input type="file" class="hidden file"/>
+                        <img src="../static/img/file.jpg" width="130" height="130" class="filejs border-radius4"/>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-4 control-label">姓名</label>
+                <div class="col-sm-8">
+                    <input id="name" type="text" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-4 control-label">LED大屏是否显示</label>
+                <div class="col-sm-8">
+                    <input type="checkbox" id="isExhibition" name="check-3" value="6" class="lcs_check lcs_tt1" checked="checked" autocomplete="off"/>
+                </div>
+            </div>
+        </form>
+        <div class="btn-bot textCenter">
+            <p class="inline-block textCenter overflow">
+                <span class="bgBlue white" onclick="save()">保存</span><span class="bgGray close-btn">取消</span>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script src="../static/layer/layer.js"></script>
+<script src="../static/js/page.js"></script>
+<script type="text/javascript" src="../static/js/lc_switch.js"></script>
+<script src="../static/js/icheck.min.js"></script>
+<script>
+    $(function () {
+
+        getData(1);
+
+        /*$('.compile-btn').click(function () {
+            //折叠元素显示隐藏
+            $(this).parent().parents().next('.compile').slideToggle();
+        });*/
+
+        $(".filejs").click(function () {
+            $(".file").click();
+        });
+
+
+        $(".file").on("change", function () {
+            var file = $(".file").val();
+            if (!file.match(/.jpg|.gif|.png|.jpeg|.bmp/i)) {　　//判断上传文件格式
+                layer.open({
+                    content: '上传的图片格式不正确，请重新选择'
+                    , skin: 'msg'
+                    //,time: 2 //2秒后自动关闭
+                });
+                return;
+            }
+            var fileObj = this.files[0];
+            var data = new FormData();
+            data.append("file", fileObj);
+            $.ajax({
+                url: "../image/upload",
+                type: "post",
+                data: data, //JSON.stringify({"file": file}),
+                dataType: "json",
+                // contentType: "application/json",
+                async: false,
+                processData: false,   //用FormData传fd时需有这两项     必要
+                contentType: false,
+                success: function (data) {
+                    if (data.code == 0000) {
+                        $("#image p img").attr("src", data.resultPath);
+                    } else {
+                        $("#image p").html(data.msg);
+                    }
+                }
+            });
+        })
+
+
+        $("#add").click(function () {
+            $("#image p img").attr("src", "../static/img/file.jpg");
+            $("#name").val("");
+            $("isExhibition").attr("checked", 'true');
+            $("#id").val("")
+            layerOpen();
+        });
+    })
+
+    //弹层
+    function layerOpen() {
+        var layerIndex = layer.open({
+            type: 1,
+            title: false,
+            closeBtn: false,
+            skin: 'layui-layer-rim', //加上边框
+            area: ['700px', ''], //宽高
+            content: $("#layerOpen"),
+            success: function () {
+
+                $(".close-btn").unbind().on("click", function (e) {
+                    layer.closeAll();
+                });
+            }
+        });
+    }
+
+    //	按钮开关
+    $('input').lc_switch();
+    // triggered each time a field changes status
+    $('body').delegate('.lcs_check', 'lcs-statuschange', function () {
+        var status = ($(this).is(':checked')) ? 'checked' : 'unchecked';
+        console.log('field changed status: ' + status);
+    });
+
+    // triggered each time a field is checked
+    $('body').delegate('.lcs_check', 'lcs-on', function () {
+        console.log('field is checked');
+    });
+
+    // triggered each time a is unchecked
+    $('body').delegate('.lcs_check', 'lcs-off', function () {
+        console.log('field is unchecked');
+    });
+
+    function getData(page) {
+        var pageSize = 9;
+        var data = {currentPage: page, pageSize: pageSize};
+        $.ajax({
+            url: "../staff/getStaffList",
+            type: "get",
+            async: false,
+            data: data,
+            dataType: "json",
+            // data: data,
+            success: function (result) {
+                var str = ""
+                if (result.code == 200) {
+                    if (result.data.records.length > 0) {
+                        for (var i = 0; i < result.data.records.length; i++) {
+                            str += "<div>";
+                            str += "<dl class=\"relative\">";
+                            str += "<dt><img src='" + result.data.records[i].photoUrl + "' class=\"border-radius5\"></dt>";
+                            str += "<dd>"
+                            str += "<p class=\"overflow\"><span class=\"compile-btn right pl10px\"><img src=\"../static/img/cz.png\"></span></p>"
+                            str += "<p><span class=\"f18px fb\">" + result.data.records[i].name + "</span></p>";
+                            if (result.data.records[i].isExhibition == 2) {
+                                str += "<p><span class=\"blue inline-block lh30px pl15px pr15px border-radius3\">大屏显示中</span></p>"
+                            }
+                            str += "<p><span class=\"lightGray\">创建于" + result.data.records[i].createTime + "</span></p>"
+                            str += "</dd>";
+                            str += "<div class=\"compile textCenter lh35px cursor f14px\">"
+                            str += "<span class=\"block\" onclick=\"editDataById('" + result.data.records[i].id + "','" + result.data.records[i].name + "','" + result.data.records[i].photoUrl + "')\">编辑</span><span onclick=\"deleteDataById('" + result.data.records[i].id + "')\" class=\"block\">删除</span></div></dl></div>"
+                        }
+                    } else {
+                        str += "暂无数据！";
+                    }
+                } else {
+                    str += result.data.msg;
+                }
+                $("#value").html(str);
+                $('.compile').hide();
+                $('.compile-btn').click(function () {
+                    //折叠元素显示隐藏
+                    $(this).parent().parents().next('.compile').slideToggle();
+                });
+                $("#page").initPage(result.data.total, result.data.current, result.data.pages, getData, pageSize);
+            }
+        })
+    }
+
+    //保存
+    function save() {
+        var photoUrl = $("#image p img").attr("src");
+        var name = $("#name").val();
+        var id = $("#id").val();
+        var isExhibition = "";
+        if ($("#isExhibition").prop("checked")) {
+            isExhibition = "2";
+        } else {
+            isExhibition = "1";
+        }
+        var data = {name: name, photoUrl: photoUrl, id: id, isExhibition: isExhibition};
+        if (isNull(name)) {
+            layer.msg("姓名不能为空")
+            return;
+        }
+
+        $.ajax({
+            url: "../staff/addStaff",
+            type: "post",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (result) {
+                if (result.code == "0000") {
+                    layer.closeAll();
+                    layer.msg(result.msg);
+                    getData(1);
+                } else {
+                    layer.open({
+                        content: result.msg
+                        , skin: 'msg'
+                    });
+                }
+            }
+        })
+    }
+
+    function editDataById(id, name, imageUrl) {
+        $("#image p img").attr("src", imageUrl);
+        $("#name").val(name);
+        $("#id").val(id)
+        layerOpen();
+    }
+
+    function deleteDataById(id) {
+        var data = {id: id};
+        layer.confirm('是否确认删除该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../staff/deleteById",
+                type: "post",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1);
+                    }
+                }
+            })
+        });
+
+    }
+
+    function isNull(value) {
+        return value == null || value === "" || value === undefined;
+    }
+</script>
+</body>
+</html>

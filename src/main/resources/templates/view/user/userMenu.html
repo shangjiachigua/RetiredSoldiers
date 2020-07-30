@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/bootstrap/css/bootstrap.min.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/bootstrap-table.min.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/jquery-treegrid/css/jquery.treegrid.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/normalize.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/iconfont.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/rightCon.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/thesame.css'"/>
+    <style type="text/css">
+        .table-con .table th, .table-con .table td{
+            text-align: left;
+        }
+        table thead th{
+            text-align: center;
+        }
+        .fixed-table-container{ border-radius:5px; border:0;  }
+        .fixed-table-container td{ padding:15px }
+        .fixed-table-container tbody td .th-inner, .fixed-table-container thead th .th-inner ,.bootstrap-table .table:not(.table-condensed), .bootstrap-table .table:not(.table-condensed)>tbody>tr>td, .bootstrap-table .table:not(.table-condensed)>tbody>tr>th, .bootstrap-table .table:not(.table-condensed)>tfoot>tr>td, .bootstrap-table .table:not(.table-condensed)>tfoot>tr>th, .bootstrap-table .table:not(.table-condensed)>thead>tr>td {
+            padding: 15px;
+        }
+        .btn-primary {
+            color: #fff;
+            border: 0;
+            border-radius: 14px;
+            line-height: 28px;
+            padding: 0 15px;
+            margin: 0 20px 0 0;
+        }
+        .btn-primary:hover {
+            color: #fff;
+            border-color: none;
+        }
+        .form-horizontal .form-group {
+            margin-bottom: 15px;
+        }
+        .treeSelect input {
+            height: 34px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<input id="userNo" th:value="${userNo}" type="hidden">
+<input id="userPage" th:value="${userPage}" type="hidden">
+<div class="right-Sidebar-con border-box">
+    <div>
+        <p class="btn-inquire mb20px table_operation">
+            <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" style="cursor: pointer" id="goBack">返回</span>
+            <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" style="cursor: pointer" id="saveButton">保存</span>
+        </p>
+        <div class="table-con bgWhite border_box border-radius5">
+            <table cellpadding="0" cellspacing="0" width="100%" border="0" class="textCenter" id="main_table">
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<script th:src="${#request.getContextPath()}+'/static/js/jquery-2.1.3.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/bootstrap-table.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/bootstrap-table-treegrid.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/jquery-treegrid/js/jquery.treegrid.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/layer/layer.js'"></script>
+<script>
+    var basePath = $("input#basePathInput",parent.document).val();
+    var $table = $('table#main_table');
+    var initChebox = true;
+
+    $(function(){
+
+        $("span#goBack").on("click",function (e) {
+            window.location.href = basePath + "/user/index?initPage="+$("input#userPage").val();
+        })
+
+        $("span#saveButton").on("click",function (e) {
+            var rows = $table.bootstrapTable('getSelections');
+            var userNo = $("input#userNo").val();
+            var menus = "";
+            if(rows && rows.length > 0){
+                $.each(rows,function (i,v) {
+                    menus += v.id + ",";
+                })
+                menus = menus.substring(0,menus.length - 1);
+            }
+            $.ajax({
+                url:basePath + "/user/setUserMenu",
+                type:"post",
+                dataType:"json",
+                data:{"userNo":userNo,"menus":menus},
+                success:function (result) {
+                    layer.msg(result.msg);
+                }
+            })
+        })
+
+        $table.bootstrapTable({
+            type:"post",
+            url: basePath + "/user/getUserMenu",
+            idField: 'id',
+            dataType:'json',
+            queryParams:function(params){
+                params["userNo"] = $("input#userNo").val();
+                return params;
+            },
+            columns: [
+                { field: 'check',  checkbox: true,align: 'center', formatter: function (value, row, index) {
+                        if (initChebox && (row.flag == 1 || row.flag == '1')) {
+                            return {  checked: true };
+                        }
+                    }
+                },
+                { field: 'name',  title: '菜单名称', halign:'center' },
+                { field: 'type',  title: '菜单类型' , align: 'center',formatter: 'statusFormatter' }
+            ],
+
+            // bootstrap-table-treegrid.js 插件配置 -- start
+
+            //在哪一列展开树形
+            treeShowField: 'name',
+            //指定父id列
+            parentIdField: 'pid',
+
+            onResetView: function(data) {
+                $table.treegrid({
+                    //initialState: 'collapsed',// 所有节点都折叠
+                    initialState: 'expanded',// 所有节点都展开，默认展开
+                    treeColumn: 1,
+                    // expanderExpandedClass: 'glyphicon glyphicon-minus',  //图标样式
+                    // expanderCollapsedClass: 'glyphicon glyphicon-plus',
+                    onChange: function() {
+                        $table.bootstrapTable('resetWidth');
+                    }
+                });
+
+                //只展开树形的第一级节点
+                //$table.treegrid('getRootNodes').treegrid('expand');
+            },
+            onLoadSuccess: function (data) {
+                initChebox = false;
+            },
+            onCheck:function(row){
+                var datas = $table.bootstrapTable('getData');
+
+                // 勾选子类
+                selectChilds(datas,row,"id","pid",true);
+
+                // 勾选父类
+                selectParentChecked(datas,row,"id","pid")
+
+                // 刷新数据
+                $table.bootstrapTable('load', datas);
+            },
+
+            onUncheck:function(row){
+                var datas = $table.bootstrapTable('getData');
+
+                // 勾选子类
+                selectChilds(datas,row,"id","pid",false);
+
+                $table.bootstrapTable('load', datas);
+            },
+            // bootstrap-table-treetreegrid.js 插件配置 -- end
+        });
+    })
+
+    function statusFormatter(value, row, index) {
+        if (value == "2" || value == 2) {
+            return '<span class="label label-success">菜单</span>';
+        } else if (value == "3" || value == 3){
+            return '<span class="label label-warning">按钮</span>';
+        }else if (value == "1" || value == 1){
+            return '<span class="label label-info">目录</span>';
+        }
+        return '-';
+    }
+
+    function selectChilds(datas,row,id,pid,checked) {
+        for(var i in datas){
+            if(datas[i][pid] == row[id]){
+                datas[i].check=checked;
+                selectChilds(datas,datas[i],id,pid,checked);
+            };
+        }
+    }
+
+    function selectParentChecked(datas,row,id,pid){
+        for(var i in datas){
+            if(datas[i][id] == row[pid]){
+                datas[i].check=true;
+                selectParentChecked(datas,datas[i],id,pid);
+            };
+        }
+    }
+
+</script>
+</body>
+</html>

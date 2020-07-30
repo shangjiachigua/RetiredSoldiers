@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/popUp.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/page.css"/>
+    <style type="text/css">
+        .table_operation span {
+            cursor: pointer
+        }
+
+        .preview-act ul {
+            padding: 0 50px 20px;
+        }
+
+        .preview-act li {
+            display: flex;
+        }
+
+        .record-inform ul li p, .preview-act p:nth-child(1) {
+            width: 129px;
+        }
+
+        .preview-con {
+            flex: 4;
+        }
+
+        .record-inform ul li .preview-con p, .preview-act p:nth-child(2) {
+            width: 0;
+            width: 100%;
+        }
+
+        .record-inform ul li .preview-con .smallimg {
+            padding-bottom: 129px;
+        }
+    </style>
+</head>
+<body>
+<!--right-Sidebar-con-->
+<input id="id" type="hidden" value="" th:value="${id}">
+<div class="right-Sidebar-con border-box">
+    <div class="record-compile-con">
+        <div class="bgWhite border-radius5 box-shadows mb5px overflow">
+            <span class="left pad20" style="border-right: 3px solid #F0EFF5; height: 65px;"><img src="../static/img/return.png" class="block" id="return"></span>
+            <span class="left pad20 f18px fb" id="title">活动标题</span>
+        </div>
+        <!--基本信息-->
+        <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative lh35px"><span class="fb">基本信息</span></h1>
+            <nav class="record-inform">
+                <ul>
+                    <li>
+                        <p><label>展示图片：</label></p>
+                        <div class="preview-con pr10px">
+                            <p id="showImg" style="background-image: url(img/tp.jpg);" class="smallimg"></p>
+                        </div>
+                    </li>
+                    <li>
+                        <p><label>房间预览：</label></p>
+                        <div class="preview-con pr10px">
+                            <p id="roomPreview" style="background-image: url(img/tp.jpg);" class="smallimg"></p>
+                        </div>
+                    </li>
+                </ul>
+                <ul>
+                    <!-- <li>
+                         <p><label>活动标题：</label></p>
+                         <p>活动室</p>
+                     </li>-->
+                    <li>
+                        <p><label>活动地址：</label></p>
+                        <p id="address">活动室</p>
+                    </li>
+                    <li>
+                        <p><label>活动室：</label></p>
+                        <p id="room" value="">活动室</p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>联系方式：</label></p>
+                        <p id="contact">345344346</p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>招募人数：</label></p>
+                        <p id="recruitsNumber">11</p>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <p><span class="red">*</span><label>是否需要随行人：</label></p>
+                        <p id="accompanying">是</p>
+                    </li>
+                    <li>
+                        <p><label>招募开始时间：</label></p>
+                        <p id="recruitsStartTime">2019-12-12</p>
+                    </li>
+                    <li>
+                        <p><label>招募结束时间：</label></p>
+                        <p id="recruitsEndTime">2019-12-12</p>
+                    </li>
+                    <li>
+                        <p><label>活动开始时间：</label></p>
+                        <p id="activityStartTime">2019-12-12</p>
+                    </li>
+                    <li>
+                        <p><label>活动结束时间：</label></p>
+                        <p id="activityEndTime">2019-12-12</p>
+                    </li>
+                </ul>
+            </nav>
+            <nav class="preview-act lh35px">
+                <ul>
+                    <li class="mb20px">
+                        <p class="fb textRight pr10px">活动简介：</p>
+                        <p id="activityDescribe">活动结束时间活动结束时间活动结束时间活动结束时间</p>
+                    </li>
+                    <li>
+                        <p class="fb textRight pr10px">活动详情：</p>
+                        <p id="details">活动结束时间活动结束时间活动结束时间</p>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <!--<div class="btn-bot textCenter pt30px pb30px">
+            <p class="inline-block textCenter overflow">
+                <span class="bgBlue white mr30px">保存</span><span class="bgGray">取消</span>
+            </p>
+        </div>-->
+    </div>
+</div>
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script>
+
+    $(function () {
+        //加载数据
+        loadData();
+        //根据roomNo加载活动室
+        loadRoom();
+
+        $("#return").click(function () {
+            window.location.href = "../activity/toActivityPage";
+        })
+    });
+
+    function loadRoom() {
+        var roomNo = $("#room").attr("value");
+        var data = {id: roomNo};
+        $.ajax({
+            url: '../activity/getActivityRoomById',
+            async: false,
+            type: 'get',
+            data: data,
+            dataType: "json",
+            contentType: "application/json",
+            success: function (data) {
+                if (data.code == 200) {
+                    if (!isNull(roomNo)) {
+                        $("#roomPreview").css("background-image", 'url(' + data.data.roomUrl + ')');
+                        $("#room").html(data.data.roomName);
+                    } else {
+                        $("#roomPreview").css("background-image", "");
+                    }
+                } else {
+
+                }
+            }
+        });
+    }
+
+
+    function loadData() {
+        var id = $("#id").val();
+        if (isNull(id)) {
+            return;
+        }
+        var data = {id: id};
+        $.ajax({
+            url: "../activity/getActivityById",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (data) {
+                if (data.code == 200) {
+                    $("#showImg").css("background-image", 'url(' + data.data.imgUrl + ')');
+                    $("#title").html(data.data.title);
+                    $("#address").html(data.data.address);
+                    $("#contact").html(data.data.contactInformation);
+                    if (data.data.accompanying == 1) {
+                        $("#accompanying").html("是");
+                    } else {
+                        $("#accompanying").html("否");
+                    }
+                    $("#activityDescribe").html(data.data.activityDescribe);
+                    $("#activityEndTime").html(data.data.activityEndTime);
+                    $("#activityStartTime").html(data.data.activityStartTime);
+                    $("#recruitsEndTime").html(data.data.recruitsEndTime);
+                    $("#recruitsStartTime").html(data.data.recruitsStartTime);
+                    $("#recruitsNumber").html(data.data.recruitsNumber);
+                    $("#details").html(data.data.details);
+                    $("#room").attr("value", data.data.roomNo);
+                }
+            }
+        })
+    }
+
+    function isNull(value) {
+        return value == null || value === "" || value === undefined;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caifu.mapper.JxActivityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caifu.pojo.JxActivity">
+        <id column="ID" property="id"/>
+        <result column="CREATE_BY" property="createBy"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_BY" property="updateBy"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
+        <result column="IMG_URL" property="imgUrl"/>
+        <result column="TITLE" property="title"/>
+        <result column="ADDRESS" property="address"/>
+        <result column="ROOM_NO" property="roomNo"/>
+        <result column="CONTACT_INFORMATION" property="contactInformation"/>
+        <result column="ACCOMPANYING" property="accompanying"/>
+        <result column="RECRUITS_NUMBER" property="recruitsNumber"/>
+        <result column="RECRUITS_START_TIME" property="recruitsStartTime"/>
+        <result column="RECRUITS_END_TIME" property="recruitsEndTime"/>
+        <result column="ACTIVITY_START_TIME" property="activityStartTime"/>
+        <result column="ACTIVITY_END_TIME" property="activityEndTime"/>
+        <result column="ACTIVITY_DESCRIBE" property="activityDescribe"/>
+        <result column="DETAILS" property="details"/>
+        <result column="STATUS" property="status"/>
+    </resultMap>
+
+    <resultMap id="activityMap" type="com.caifu.dto.JxActivityDto">
+        <id column="ID" property="id"/>
+        <result column="IMG_URL" property="imgUrl"/>
+        <result column="TITLE" property="title"/>
+        <result column="ADDRESS" property="address"/>
+        <result column="RECRUITS_NUMBER" property="recruitsNumber"/>
+        <result column="ACTIVITY_START_TIME" property="activityStartTime"/>
+        <result column="ACTIVITY_END_TIME" property="activityEndTime"/>
+        <result column="ACTIVITY_DESCRIBE" property="activityDescribe"/>
+        <result column="countNum" property="recruitsCountNumber"/>
+    </resultMap>
+
+    <select id="selectActivityList" resultMap="activityMap" parameterType="map">
+
+        SELECT ID,IMG_URL,TITLE,ADDRESS,RECRUITS_NUMBER,
+        ACTIVITY_START_TIME,ACTIVITY_END_TIME,
+        ACTIVITY_DESCRIBE,
+        IFNULL(countTable.countNum,0) countNum
+        FROM jx_activity ja
+        left join
+        (SELECT count(0) countNum,ACTIVITY_ID FROM jx_activity_menber
+        WHERE STATUS =1 GROUP BY ACTIVITY_ID) countTable
+        ON ja.ID = countTable.ACTIVITY_ID where 1=1
+
+        <if test="title!=null and title!=''">
+            and ja.TITLE like CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR}),'%')
+        </if>
+
+        <if test="status != null and status !=''">
+            and ja.status =#{status}
+        </if>
+
+        <if test="currentTimeOut != null and currentTimeOut !=''">
+            and ja.ACTIVITY_END_TIME &lt;= NOW()
+        </if>
+
+    </select>
+
+</mapper>

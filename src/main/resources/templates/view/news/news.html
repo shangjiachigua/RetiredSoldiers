@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/popUp.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/page.css"/>
+    <style type="text/css">
+        .table_operation span {
+            cursor: pointer
+        }
+    </style>
+</head>
+<body>
+<!--<input id="initPage" th:value="${initPage}" type="hidden">-->
+<!--<input type="button" value="全部新闻" id="allNews"> <input type="button" value="推荐新闻" id="recommendNews">-->
+<div class="record-btn overflow textCenter f18px bgWhite">
+    <p class="cursor current" value="1" id="allNews">全部新闻</p>
+    <p class="cursor" value="0" id="recommendNews">推荐新闻<span class="red" id="count"></span></p>
+</div>
+<div class="right-Sidebar-con border-box" id="all">
+    <div>
+        <div class="form-inline form-group-search pt20px pb20px pr30px">
+            <p class="form-group btn-inquire mb20px table_operation">
+                <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" id="addPolicy">新建</span>
+                <!--            <input type="text" placeholder="请输入标题" id="title"><input type="button" value="查询" id="searchButton">-->
+            </p>
+            <p class="relative form-group form-group-width">
+                <input type="text" class="form-control" id="title" name="name" placeholder="请输入标题">
+                <span class="glyphicon glyphicon-search form-control-feedback lightGray" style="top:3px; left: 0;"></span>
+            </p>
+            <p class="relative form-group ml20px">
+                <span class="block bgBlue white border-radius5 pl30px pr30px lh40px cursor" id="searchButton">搜  索</span>
+            </p>
+        </div>
+
+        <!-- <p class="btn-inquire mb20px table_operation">
+             <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" id="addPolicy">新建</span>
+             <input type="text" placeholder="请输入标题" class="title" id="title"><input type="button" value="查询" class="searchButton" id="searchButton">
+         </p>-->
+
+        <div class="table-con bgWhite border_box border-radius5">
+            <table cellpadding="0" cellspacing="0" width="100%" border="0" class="textCenter" id="main_table">
+                <thead>
+                <tr>
+                    <th style="width: 15%">序号</th>
+                    <th style="width: 15%">标题</th>
+                    <th style="width: 10%">浏览数</th>
+                    <th style="width: 10%">点赞数</th>
+                    <th style="width: 20%">创建时间</th>
+                    <th style="width: 30%">操作</th>
+                </tr>
+                </thead>
+                <tbody id="value" class="value">
+
+                </tbody>
+            </table>
+            <div class="textCenter page-con">
+                <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="right-Sidebar-con border-box" style="display: none" id="recommend">
+    <input type="hidden" value="" id="is_top" class="is_top">
+    <div>
+        <div class="form-inline form-group-search pt20px pb20px pr30px">
+            <p class="relative form-group form-group-width">
+                <input type="text" class="form-control" id="title2" name="name" placeholder="请输入标题">
+                <span class="glyphicon glyphicon-search form-control-feedback lightGray" style="top:3px; left: 0;"></span>
+            </p>
+            <p class="relative form-group ml20px">
+                <span class="block bgBlue white border-radius5 pl30px pr30px lh40px cursor" id="searchButton2">搜  索</span>
+            </p>
+        </div>
+        <!--<p class="btn-inquire mb20px table_operation">
+            <input type="text" placeholder="请输入标题" class="title" id="title2"><input type="button" value="查询" class="searchButton" id="searchButton2">
+        </p>-->
+        <div class="table-con bgWhite border_box border-radius5">
+            <table cellpadding="0" cellspacing="0" width="100%" border="0" class="textCenter" id="main_table2">
+                <thead>
+                <tr>
+                    <th style="width: 10%">序号</th>
+                    <th style="width: 15%">标题</th>
+                    <th style="width: 10%">浏览数</th>
+                    <th style="width: 10%">点赞数</th>
+                    <th style="width: 15%">创建时间</th>
+                    <th style="width: 40%">操作</th>
+                </tr>
+                </thead>
+                <tbody id="value2" class="value">
+
+                </tbody>
+            </table>
+            <div class="textCenter page-con">
+                <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10" id="page2"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/js/jquery-2.1.3.min.js"></script>
+<script src="../static/layer/layer.js"></script>
+<script src="../static/js/page.js"></script>
+<script src="../static/validation/jquery.validate.js"></script>
+
+<script>
+
+    $(function () {
+
+        getData(1);
+        countGrass();
+
+        $("#addPolicy").click(function () {
+            window.location.href = "../news/toAddNews";
+        });
+
+        $("#searchButton").click(function () {
+            getData(1);
+        });
+
+        $("#searchButton2").click(function () {
+            getData2(1);
+        });
+
+        $("#allNews").click(function () {
+            $(this).addClass('current').siblings().removeClass('current');
+            $("#all").css("display", "");
+            $("#recommend").css("display", "none");
+            $("#title").val("");
+            getData(1);
+        });
+
+        $("#recommendNews").click(function () {
+            $(this).addClass('current').siblings().removeClass('current');
+            $("#all").css("display", "none");
+            $("#recommend").css("display", "");
+            $("#title2").val("");
+            $("#is_top").val("1");
+            getData2(1);
+        });
+    });
+
+    //推荐新闻个数
+    function countGrass() {
+        $.ajax({
+            url: "../news/countGrass",
+            type: "get",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.code == 0000) {
+                    $("#count").html(data.count);
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        })
+    }
+
+    function getData(page) {
+        var title = $("#title").val();
+        var pageSize = 15;
+        var data = {currentPage: page, pageSize: pageSize, title: title}
+        $.ajax({
+            url: "../news/getNewsList",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (result) {
+                var html = "";
+                if (result.code == 200) {
+                    if (result.data.list.length > 0) {
+                        var orderNum = (result.data.pageNum - 1) * pageSize
+                        for (var i = 0; i < result.data.list.length; i++) {
+                            html += "<tr>";
+                            html += "<td>" + (orderNum + i + 1) + "</td>";
+                            html += "<td>" + result.data.list[i].title + "</td>"
+                            html += "<td>" + result.data.list[i].browseNumber + "</td>"
+                            html += "<td>" + result.data.list[i].niceNumber + "</td>"
+                            html += "<td>" + result.data.list[i].createTime + "</td>"
+                            html += "<td><p class=\"delete-img\"><span onclick=\"editDataByid('" + result.data.list[i].id + "')\"><img src=\"../static/img/bianji.png\"></span><span class='delete mr15px ml15px' onclick=\"deleteDataById('" + result.data.list[i].id + "')\"><img src=\"../static/img/shanchu.png\"></span>"
+                            if (result.data.list[i].isTop == 0) {
+                                html += "<span class=\"mr15px\" onclick=\"grassDataByid('" + result.data.list[i].id + "','" + result.data.list[i].isTop + "')\"><img src=\"../static/img/fb.png\"></span></p></td>";
+                            } else {
+                                html += "<span class=\"mr15px\" onclick=\"grassDataByid('" + result.data.list[i].id + "','" + result.data.list[i].isTop + "')\"><img src=\"../static/img/qxfb.png\"></span></p></td>";
+                            }
+                            html += "</tr>"
+                        }
+                    } else {
+                        html += "<tr><td colspan='5'>暂无数据信息！</td></tr>";
+                    }
+                } else {
+                    html += "<tr><td colspan='5'>获取列表失败！</td></tr>";
+                }
+                $("#value").html(html);
+                $("#page").initPage(result.data.total, result.data.pageNum, result.data.pages, getData, pageSize);
+            }
+        })
+    }
+
+    function getData2(page) {
+        var isTop = $("#is_top").val();
+        var title = $("#title2").val();
+        var pageSize = 15;
+        var data = {currentPage: page, pageSize: pageSize, title: title, isTop: isTop}
+        $.ajax({
+            url: "../news/getNewsList",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (result) {
+                var html = "";
+                if (result.code == 200) {
+                    if (result.data.list.length > 0) {
+                        var orderNum = (result.data.pageNum - 1) * pageSize
+                        for (var i = 0; i < result.data.list.length; i++) {
+                            html += "<tr>";
+                            html += "<td>" + (orderNum + i + 1) + "</td>";
+                            html += "<td>" + result.data.list[i].title + "</td>"
+                            html += "<td>" + result.data.list[i].browseNumber + "</td>"
+                            html += "<td>" + result.data.list[i].niceNumber + "</td>"
+                            html += "<td>" + result.data.list[i].createTime + "</td>"
+                            html += "<td><p class=\"delete-img\"><span onclick=\"editDataByid('" + result.data.list[i].id + "')\"><img src=\"../static/img/bianji.png\"></span><span class='delete mr15px ml15px' class='delete' onclick=\"deleteDataById('" + result.data.list[i].id + "')\"><img src=\"../static/img/shanchu.png\"></span>"
+                            if (result.data.list[i].isTop == 0) {
+                                html += "<span class=\"mr15px\" onclick=\"grassDataByid2('" + result.data.list[i].id + "','" + result.data.list[i].isTop + "')\"><img src=\"../static/img/fb.png\"></p></td>";
+                            } else {
+                                html += "<span class=\"mr15px\" onclick=\"grassDataByid2('" + result.data.list[i].id + "','" + result.data.list[i].isTop + "')\"><img src=\"../static/img/qxfb.png\"></p></td>";
+                            }
+                            html += "</tr>"
+                        }
+                    } else {
+                        html += "<tr><td colspan='5'>暂无数据信息！</td></tr>";
+                    }
+                } else {
+                    html += "<tr><td colspan='5'>获取列表失败！</td></tr>";
+                }
+                $("#value2").html(html);
+                $("#page2").initPage(result.data.total, result.data.pageNum, result.data.pages, getData);
+            }
+        })
+    }
+
+    function editDataByid(id) {
+        window.location.href = "../news/toAddNews?id=" + id;
+    }
+
+    function grassDataByid(id, isTop) {
+        var data = {id: id, isTop: isTop};
+        $.ajax({
+            url: "../news/grassOrCancel",
+            type: "get",
+            data: data,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.code == 0000) {
+                    getData(1)
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        })
+        countGrass();
+    }
+
+    function grassDataByid2(id, isTop) {
+        var data = {id: id, isTop: isTop};
+        $.ajax({
+            url: "../news/grassOrCancel",
+            type: "get",
+            data: data,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.code == 0000) {
+                    getData2(1)
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        })
+        countGrass();
+    }
+
+
+    function deleteDataById(id) {
+        var data = {id: id};
+        layer.confirm('是否确认删除该信息？', {
+            btn: ['确定', '取消']
+        }, function () {
+            layer.closeAll();
+            $.ajax({
+                url: "../news/deleteById",
+                type: "post",
+                async: false,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    if (result.code == 0000) {
+                        layer.msg(result.msg);
+                        getData(1);
+                    }
+                }
+            })
+        });
+
+    }
+
+</script>
+</body>
+</html>

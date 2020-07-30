@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/headCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/leftSidebar.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/rightCon.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/thesame.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/ueditor/themes/iframe.css"/>
+    <style type="text/css">
+        .intro-con dd {
+            margin-top: 20px;
+        }
+
+        .intro-con dd img {
+            width: 30px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<input id="id" type="hidden" value="" th:value="${id}">
+<!--right-Sidebar-con-->
+<div class="right-Sidebar-con border-box">
+    <div class="record-compile-con">
+        <div class="bgWhite border-radius5 box-shadows mb5px overflow">
+            <span class="left pad20" style="border-right: 3px solid #F0EFF5; height: 65px;"><img src="../static/img/return.png" class="block"></span>
+            <span class="left pad20 f18px fb">新建新闻</span>
+        </div>
+        <div class="bgWhite border-radius5 box-shadows mb20px">
+            <nav class="record-inform lh35px" style="width: 60%; margin: 0 auto; padding: 0 0 0;">
+                <ul>
+                    <li>
+                        <p><span class="red">*</span><label>标题：</label></p>
+                        <p><input id="title" type="text" class="form-control"></p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>简介：</label></p>
+                        <p><input id="introduction" type="text" class="form-control"></p>
+                    </li>
+                    <li>
+                        <p class="fb"><span class="red">*</span>内容：</p>
+                        <script type="text/plain" id="uploadEditor" name="myContent">
+                        </script>
+                    </li>
+                    <li class="overflow">
+                        <p><label>图片：</label></p>
+                        <p class="record-file" style="margin: 0;" id="image">
+								<span>
+									<input type="file" id="file" class="hidden file"/>
+									<img src="../static/img/file.jpg" width="130" height="130" class="filejs border-radius4"/>
+								</span>
+                        </p>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="btn-bot textCenter pt30px pb30px">
+            <p class="inline-block textCenter overflow">
+                <span class="bgBlue white mr30px" id="save">保存</span><span class="bgGray" id="return">返回</span>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="../static/js/jquery-2.1.3.min.js" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8" src="../static/ueditor/ueditor.config.js" th:src="@{/static/ueditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" src="../static/ueditor/ueditor.all.js" th:src="@{/static/ueditor/ueditor.all.js}"></script>
+<script type="text/javascript" charset="utf-8" src="../static/ueditor/lang/zh-cn/zh-cn.js" th:src="@{/static/ueditor/lang/zh-cn/zh-cn.js}"></script>
+<script type="text/javascript" src="../static/layer/layer.js"></script>
+<script>
+    //实例化编辑器
+    var ue = UE.getEditor('uploadEditor', {
+        toolbars: [
+            [
+                'fontfamily', //字体
+                'fontsize', //字号
+                'undo', //撤销
+                'redo', //重做
+                '|',
+                'emotion', //表情
+                'forecolor', //字体颜色
+                'backcolor', //背景色
+                'bold', //加粗
+                'underline', //下划线
+                'strikethrough', //删除线
+                '|',
+                'justifyleft', //居左对齐
+                'justifyright', //居右对齐
+                'justifycenter', //居中对齐
+                '|',
+                'link', //超链接
+                'unlink', //取消链接
+                'simpleupload', //单图上传
+                //'insertimage', //多图上传
+                //'music', //音乐
+                //'insertvideo', //视频
+                'removeformat', //清除格式
+                'formatmatch', //格式刷
+                'source', //源代码
+            ]
+        ],
+        enableAutoSave: false,
+        autoHeightEnabled: true,
+        autoFloatEnabled: true,
+        scaleEnabled: true,//滚动条
+        initialFrameHeight: 400 //默认的编辑区域高度
+    });
+
+    UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+    UE.Editor.prototype.getActionUrl = function (action) {
+        if (action == 'uploadimage' || action == 'uploadscrawl' || action == 'uploadimage') {
+            return 'http://localhost:8088/caifu/ueditor/imgUpdate'; //在这里返回我们实际的上传图片地址
+        } else {
+            return this._bkGetActionUrl.call(this, action);
+        }
+    }
+
+    $(function () {
+        loadData();
+
+        $(".filejs").click(function () {
+            $(".file").click();
+        });
+
+        $(".file").on("change", function () {
+            var file = $(".file").val();
+            if (!file.match(/.jpg|.gif|.png|.jpeg|.bmp/i)) {　　//判断上传文件格式
+                layer.open({
+                    content: '上传的图片格式不正确，请重新选择'
+                    , skin: 'msg'
+                    //,time: 2 //2秒后自动关闭
+                });
+                return;
+            }
+            var fileObj = this.files[0];
+            var data = new FormData();
+            data.append("file", fileObj);
+            $.ajax({
+                url: "../image/upload",
+                type: "post",
+                data: data, //JSON.stringify({"file": file}),
+                dataType: "json",
+                // contentType: "application/json",
+                async: false,
+                processData: false,   //用FormData传fd时需有这两项     必要
+                contentType: false,
+                success: function (data) {
+                    if (data.code == 0000) {
+                        $("#image span img").attr("src", data.resultPath);
+                    } else {
+                        $("#image span").html(data.msg);
+                    }
+                }
+            });
+        })
+
+        //保存
+        $("#save").click(function () {
+            savePolicy();
+        })
+
+        //返回
+        $("#return").click(function () {
+            window.location.href = "../news/toNewsPage";
+        })
+
+    });
+
+    function savePolicy() {
+        var imageUrl = $("#image span img").attr("src");
+        var title = $("#title").val();
+        var introduction = $("#introduction").val();
+        var content = ue.getContent();
+        var id = $("#id").val();
+        if (isNull(title)) {
+            layer.msg("请输入标题");
+            return;
+        }
+        if (isNull(introduction)) {
+            layer.msg("请输入简介");
+            return;
+        }
+        if (isNull(content)) {
+            layer.msg("请输入内容");
+            return;
+        }
+        var data = {id: id, title: title, briefIntroduction: introduction, imgUrl: imageUrl, content: content}
+        $.ajax({
+            url: "../news/addNews",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (data) {
+                if (data.code == 0000) {
+                    layer.alert(data.msg, function () {
+                        window.location.href = "../news/toNewsPage";
+                    })
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        })
+    }
+
+    function loadData() {
+        var id = $("#id").val();
+        if (isNull(id)) {
+            return;
+        }
+        var data = {id: id};
+        $.ajax({
+            url: "../news/getNewsById",
+            type: "get",
+            dataType: "json",
+            data: data,
+            async: false,
+            success: function (data) {
+                if (data.code == 200) {
+                    ue.ready(function () {
+                        ue.setContent(data.data.content);
+                    })
+                    console.log(data.data.imgUrl)
+                    if (!isNull(data.data.imgUrl)) {
+                        $("#image span img").attr("src", data.data.imgUrl);
+                    }
+                    $("#title").val(data.data.title);
+                    $("#introduction").val(data.data.briefIntroduction);
+                } else {
+                    ue.ready(function () {
+                        ue.setContent(data.msg);
+                    })
+                }
+            }
+        })
+    }
+
+    function isNull(value) {
+        return value == null || value === "" || value === undefined;
+    }
+</script>
+</body>
+</html>

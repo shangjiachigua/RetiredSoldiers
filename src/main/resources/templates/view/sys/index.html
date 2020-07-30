@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css"th:href="${#request.getContextPath()}+'/static/bootstrap/css/bootstrap.min.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/normalize.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/iconfont.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/headCss.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/leftSidebar.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/rightCon.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/thesame.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/popUp.css'"/>
+    <style type="text/css">
+        .layui-layer-rim{border: none !important;}
+    </style>
+</head>
+<body>
+<input type="hidden" id="basePathInput" th:value="${#request.getScheme()+'://'+ #request.getServerName() + ':'+#request.getServerPort()+ #request.getContextPath()}">
+
+<div th:replace="view/sys/head :: head"></div>
+<div th:replace="view/sys/left :: left"></div>
+
+<section class="right-Sidebar relative" id="sectionMain">
+    <iframe id="mainContainer" name="mainContainer" style="overflow: visible;border: none" width="100%" height="100%" scrolling="no" marginheight="0" marginwidth="0" th:src="${#request.getContextPath()}+'/welcome'"></iframe>
+</section>
+<script th:src="${#request.getContextPath()}+'/static/js/jquery-2.1.3.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/layer/layer.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/sidebarTown.js'" charset="utf-8"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/page.js'" charset="utf-8"></script>
+<script th:src="${#request.getContextPath()}+'/static/validation/jquery.validate.js'"></script>
+<script>
+    jQuery.validator.addMethod("alnum", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9]{0,20}$/.test(value);
+    }, "只支持英文字母和数字！");
+    var basePath = $("input#basePathInput").val();
+    $(function(){
+        $('.select-down').on("click",function(e){
+            $(this).parent().next('ul.select-ul').slideToggle();
+            var src = $(this).find('img');
+            if(src.attr('src').indexOf('img/down_arrow.png') != -1){
+                src.attr('src',basePath+'/static/img/top_arrow.png');
+            }else{
+                src.attr('src',basePath+'/static/img/down_arrow.png');
+            }
+        })
+        
+        $("li#changePassword").on("click",function (e) {
+            layerOpen();
+        })
+
+        $("span#loginOut").on("click",function (e) {
+            window.location.href = basePath+"/outLogin";
+        })
+        getMenu();
+    })
+
+    function layerOpen() {
+        var layerIndex = layer.open({
+            type: 1,
+            title: false,
+            closeBtn: false,
+            skin: 'layui-layer-rim', //加上边框
+            area: ['700px', ''], //宽高
+            content: layerHtml,
+            success:function(){
+                var scope = $("div#layerHtmlDiv");
+                var form = $("form#userForm",scope);
+                $(form).validate(
+                    {
+                        rules:{
+                            newPassword:{required:true,minlength:6,maxlength:20,alnum:true}
+                        },
+                        messages:{
+                            newPassword:{required:"新密码不能为空！",minlength:"新密码长度至少为6位！",maxlength:"新密码长度不能超过20位！"}
+                        }
+                    }
+                );
+
+                $("input#repeatNewPassword").unbind().on("blur",function (e) {
+                    var newPassword = $("input#newPassword").val();
+                    var repeatNewPassword = $(this).val();
+                    if(!(repeatNewPassword && $.trim(repeatNewPassword))){
+                        $("label#repeatNewPassword-error").text("请再次确认新密码！").css("display", "inline");
+                    }else if(newPassword != repeatNewPassword){
+                        $("label#repeatNewPassword-error").text("两次密码输入不一致！").css("display", "inline");
+                    }else{
+                        $("label#repeatNewPassword-error").css("display", "none");
+                    }
+                })
+
+                $(".close-btn",scope).unbind().on("click",function(e){
+                    layer.closeAll();
+                });
+
+                $("span#submitNewPassword").unbind().on("click",function (e) {
+
+                    if($(form).valid()){
+                        var repeatNewPassword = $("input#repeatNewPassword").val();
+                        var newPassword = $("input#newPassword").val();
+                        var flag = true;
+                        if(!(repeatNewPassword && $.trim(repeatNewPassword))){
+                            flag = false;
+                            $("label#repeatNewPassword-error").text("请再次确认新密码！").css("display", "inline");
+                        }else if(newPassword != repeatNewPassword){
+                            flag = false;
+                            $("label#repeatNewPassword-error").text("两次密码输入不一致！").css("display", "inline");
+                        }else{
+                            $("label#repeatNewPassword-error").css("display", "none");
+                        }
+                        if(flag){
+                            $.ajax({
+                                url:basePath + "/user/changePassword",
+                                type:"post",
+                                dataType:"json",
+                                data:{"newPassword":newPassword},
+                                success:function (result) {
+                                    layer.closeAll();
+                                    layer.msg(result.msg);
+                                    $('.select-down').trigger("click");
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        });
+    }
+
+    function getMenu() {
+        $.ajax({
+            url:basePath+"/getMenuByUser",
+            type:"post",
+            dataType:"json",
+            success:function (result) {
+                if(result.code == 200){
+                    var html = '';
+                    var mList = composeTree(result.data);
+                    if(mList && mList.length > 0){
+                        $.each(mList,function (i,v) {
+                            html += '<dl><dt><a href="javascript:void(0)"><i class="iconfont">&#xe609;</i><span>'+v.name+'</span><span><img src="'+basePath+'/static/img/left_down_b.png"></span></a></dt>';
+                            cList = v.children;
+                            if(cList && cList.length > 0){
+                                html += "<dd><ul>";
+                                $.each(cList,function (ii,vv) {
+                                    html += '<li><a href="javascript:void(0)" class="menuItem" data-url="'+vv.url+'">'+vv.name+'</a></li>';
+                                })
+                                html += "</ul></dd></dl>";
+                            }
+                        })
+                    }
+                    $("article#menuArticle").html(html);
+                    $(".left-sidebar-con dd").hide();
+                    $(".left-sidebar-con dl dt").click(function(){
+                        //折叠元素显示隐藏
+                        $(this).next('dd').slideToggle();
+                        $(this).parent().siblings().find('dd').slideUp();
+                        //切换箭头图片
+                        var that = this;
+                        var src = $(this).find('img');
+                        if(src.attr('src').indexOf('/static/img/left_down_r.png') != -1){
+                            src.attr('src',basePath + '/static/img/left_down_b.png');
+                            $(that).parent().siblings().find("dt img").attr('src',basePath + '/static/img/left_down_r.png');
+                        }else{
+                            src.attr('src',basePath + '/static/img/left_down_r.png');
+                        }
+                    });
+                    //折叠元素中选中选中样式
+                    $(".left-sidebar-con dl li a").click(function(){
+                        var url = $(this).data("url");
+                        if(url && "null" != url){
+                            window.frames['mainContainer'].location.href= basePath + url;
+                        }
+                        $(this).addClass('current').parent().siblings().children().removeClass('current');
+                    });
+                }
+            }
+        })
+    }
+    // 数组转tree
+    function composeTree(list) {
+        var data = JSON.parse(JSON.stringify(list));
+        var result = [];
+        if (!Array.isArray(data)) {
+            return result;
+        }
+        $.each(data,function (i,v) {
+            delete v.children;
+        })
+        var map = {};
+        $.each(data,function (i,v) {
+            map[v.menuNo] = v;
+        })
+        $.each(data,function (i,v) {
+            var parent = map[v.parentNo];
+            if (parent) {
+                (parent.children || (parent.children = [])).push(v);
+            } else {
+                if(v.type == "1" || v.type == 1) {
+                    result.push(v);
+                }
+            }
+        })
+        return result;
+    }
+
+    var layerHtml = '<div class="popUp" id="layerHtmlDiv">\n' +
+        '<ul class="pop-ul textCenter f18px fb relative">\n' +
+        '<li><span>修改密码</span></li>\n' +
+        '<p><span class="close-btn"><img src="'+basePath+'/static/img/close.png"></span></p>\n' +
+        '</ul>\n' +
+        '<div class="form-con">\n' +
+        '<form class="form-horizontal" id="userForm" role="form">\n' +
+        '<input type="hidden" name="userNo" id="userNo" /> '+
+        '<div class="form-group row">\n' +
+        '<label class="col-sm-3 control-label"><span class="red">* </span>新密码</label>\n' +
+        '<div class="col-sm-9">\n' +
+        '<input type="password" name="newPassword" id="newPassword" class="form-control" maxlength="20" autocomplete="off" placeholder="请输入新密码">\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '<div class="form-group row">\n' +
+        '<label class="col-sm-3 control-label"><span class="red">* </span>确认密码</label>\n' +
+        '<div class="col-sm-9">\n' +
+        '<input type="password" name="repeatNewPassword" id="repeatNewPassword" class="form-control" maxlength="20" autocomplete="off" placeholder="请输再次输入新密码">\n' +
+        '<label id="repeatNewPassword-error" style="display: none;" class="error" for="repeatNewPassword"></label>'+
+        '</div>\n' +
+        '</div>\n' +
+        '</form>\n' +
+        '<div class="btn-bot textCenter">\n' +
+        '<p class="inline-block textCenter overflow">\n' +
+        '<span class="bgBlue white" id="submitNewPassword">确认</span><span class="bgGray close-btn">取消</span>\n' +
+        '</p>\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '</div>';
+
+</script>
+</body>
+</html>

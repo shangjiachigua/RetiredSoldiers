@@ -1,0 +1,12 @@
+
+.layui-layer{ border-radius: 10px !important }
+.table > thead > tr > th{ border:0; }
+.popUp .pop-ul{ padding:20px; border-bottom:1px solid #f6f6f6; overflow: hidden; }
+.popUp .pop-ul p{ position: absolute; right: 20px; top: 20px; }
+.popUp .form-con form{ width: 80%; margin: 30px auto; }
+.popUp .pop-ul img{ display: block; width: 24px; }
+.btn-bot{ padding:30px; border-top:1px solid #f6f6f6;}
+.btn-bot span{ line-height: 50px; display: inline-block; border-radius: 5px; width: 250px; margin-left: 30px; font-size: 16px; }
+.btn-bot span:hover{ cursor: pointer; }
+.btn-bot span em{ vertical-align: -3px; margin-right: 20px; font-size:20px; }
+

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css"th:href="${#request.getContextPath()}+'/static/bootstrap/css/bootstrap.min.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/normalize.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/iconfont.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/rightCon.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/thesame.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/popUp.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/icheck.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/page.css'"/>
+    <style type="text/css">
+        p.table_operation span,span.bgBlue{cursor: pointer}
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<input id="initPage" th:value="${initPage}" type="hidden">
+<div class="right-Sidebar-con border-box">
+    <div class="record-btn overflow textCenter f18px bgWhite">
+        <p data-type="" class="current cursor searchTypeP">全部<span class="blue fb">[[${allCount}]]</span></p>
+        <p data-type="1" class="cursor searchTypeP">退休<span class="blue fb">[[${signOutCount}]]</span></p>
+        <p data-type="2" class="cursor searchTypeP">离休<span class="blue fb">[[${leaveCount}]]</span></p>
+    </div>
+    <div class="search-ul">
+        <ul>
+            <li>
+                <div>常用搜索：</div>
+            </li>
+            <li>
+                <p><input data-field="姓名" type="text" id="name" class="form-control" placeholder="请输入姓名" autocomplete="off"  autofocus></p>
+                <p>
+                    <select data-field="支部" id="branch" class="form-control form-select">
+                        <option value="">支部</option>
+                        <option th:each ="zb,zbStat : ${zhibu}" th:value="${zb.id}">[[${zb.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select data-field="年龄" id="age" class="form-control form-select">
+                        <option value="">年龄</option>
+                        <option value="0-49">50以下</option>
+                        <option value="50-59">50-59</option>
+                        <option value="60-69">60-69</option>
+                        <option value="70-79">70-79</option>
+                        <option value="80">80及以上</option>
+                    </select>
+                </p>
+                <p>
+                    <select data-field="性别" id="sex" class="form-control form-select">
+                        <option value="">性别</option>
+                        <option value="1">男</option>
+                        <option value="2">女</option>
+                    </select>
+                </p>
+                <p>
+                    <select data-field="民族" id="nation" class="form-control form-select">
+                        <option value="">民族</option>
+                        <option th:each ="mz,mzStat : ${minzu}" th:value="${mz.id}">[[${mz.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select data-field="婚姻状况" id="maritalStatus" class="form-control form-select">
+                        <option value="">婚姻状况</option>
+                        <option th:each ="hyzk,hyzkStat : ${hunyingzhuangkuang}" th:value="${hyzk.id}">[[${hyzk.name}]]</option>
+                    </select>
+                </p>
+                <p class="btn-inquire"><span class="inline-block blue border-radius5 lh40px border-box textCenter" id="searchButton">查询</span></p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <div>健康状况：</div>
+            </li>
+            <li>
+                <p>
+                    <select data-field="因公伤残" id="invalidismCommunalLevel" class="form-control form-select">
+                        <option value="">因公伤残</option>
+                        <option th:each ="scjb,scjbStat : ${shangcandengji}" th:value="${scjb.id}">[[${scjb.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select data-field="因病伤残" id="invalidismIllnessLevel" class="form-control form-select">
+                        <option value="">因病伤残</option>
+                        <option th:each ="scjb,scjbStat : ${shangcandengji}" th:value="${scjb.id}">[[${scjb.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select data-field="因战伤残" id="invalidismWarfareLevel" class="form-control form-select">
+                        <option value="">因战伤残</option>
+                        <option th:each ="scjb,scjbStat : ${shangcandengji}" th:value="${scjb.id}">[[${scjb.name}]]</option>
+                    </select>
+                </p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <div>军旅情况：</div>
+            </li>
+            <li>
+                <p><input id="joinupDate" readonly data-field="入伍时间" type="text" class="form-control test-item1" placeholder="入伍时间" autofocus></p>
+                <p><input id="startWorkDate" readonly data-field="参加工作时间" type="text" class="form-control test-item1" placeholder="参加工作时间"></p>
+                <p><input id="receiveDate" readonly data-field="接收时间" type="text" class="form-control test-item1" placeholder="接收时间"></p>
+                <p>
+                    <select id="troopsType" data-field="部队类别" class="form-control form-select">
+                        <option value="">部队类别</option>
+                        <option th:each ="bdlb,bdlbStat : ${buduileibie}" th:value="${bdlb.id}">[[${bdlb.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select id="caderType" data-field="干部类型" class="form-control form-select">
+                        <option value="">干部类型 </option>
+                        <option th:each ="gblb,gblbStat : ${ganbuleibie}" th:value="${gblb.id}">[[${gblb.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select id="skillLevel" data-field="技术等级" class="form-control form-select">
+                        <option value="">技术等级 </option>
+                        <option th:each ="jsdj,jsdjStat : ${jishudengji}" th:value="${jsdj.id}">[[${jsdj.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select id="dutiesLevel" data-field="职务等级" class="form-control form-select">
+                        <option value="">职务等级 </option>
+                        <option th:each ="zwdj,zwdjStat : ${zhiwudengji}" th:value="${zwdj.id}">[[${zwdj.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select id="nowTreatment" data-field="现职级待遇" class="form-control form-select">
+                        <option value="">现职级待遇 </option>
+                        <option th:each ="xzjdy,xzjdyStat : ${xianzhijidaiyu}" th:value="${xzjdy.id}">[[${xzjdy.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select id="liGong" data-field="立功情况" class="form-control form-select">
+                        <option value="">立功情况 </option>
+                        <option th:each ="lgdj,lgdjStat : ${ligongdengji}" th:value="${lgdj.id}">[[${lgdj.name}]]</option>
+                    </select>
+                </p>
+                <p>
+                    <select id="canZhan" data-field="参战情况" class="form-control form-select">
+                        <option value="">参战情况</option>
+                        <option th:each ="zy,zyStat : ${zhanyi}" th:value="${zy.id}">[[${zy.name}]]</option>
+                    </select>
+                </p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <div>其他情况：</div>
+            </li>
+            <li>
+                <div class="overflow">
+                    <p>
+                        <select id="specialSubsidy" data-field="享受国务院津贴" class="form-control form-select">
+                            <option value="">享受国务院津贴</option>
+                            <option value="1">是</option>
+                            <option value="">否</option>
+                        </select>
+                    </p>
+                    <p>
+                        <select id="nursingExpenses" data-field="享受护理费" class="form-control form-select">
+                            <option value="">享受护理费 </option>
+                            <option value="1">是</option>
+                            <option value="">否</option>
+                        </select>
+                    </p>
+                    <p>
+                        <select id="longtermInsurance" data-field="享受长护险" class="form-control form-select">
+                            <option value="">享受长护险 </option>
+                            <option value="1">是</option>
+                            <option value="">否</option>
+                        </select>
+                    </p>
+                    <p>
+                        <select id="familyDoctor" data-field="享受家庭医生" class="form-control form-select">
+                            <option value="">享受家庭医生 </option>
+                            <option value="1">是</option>
+                            <option value="">否</option>
+                        </select>
+                    </p>
+                    <p>
+                        <select id="purchaseJjga" data-field="购买久久关爱" class="form-control form-select">
+                            <option value="">购买久久关爱 </option>
+                            <option value="1">是</option>
+                            <option value="">否</option>
+                        </select>
+                    </p>
+                    <p>
+                        <select id="purchaseAkt" data-field="购买安康通" class="form-control form-select">
+                            <option value="">购买安康通 </option>
+                            <option value="1">是</option>
+                            <option value="">否</option>
+                        </select>
+                    </p>
+                </div>
+                <div class="inquire-icheck overflow">
+                    <p>特殊情况：</p>
+                    <p th:each ="zy,zyStat : ${zhanyi}">
+                        <input data-field="特殊情况" th:id="${'tsqk_'+zy.id}" th:data-text="${zy.name}" type="checkbox" th:value="${zy.id}" /><label>[[${zy.name}]]</label>
+                    </p>
+                </div>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <div>当前筛选：</div>
+            </li>
+            <li id="searchSpanLi">
+
+            </li>
+            <li>
+                <p class="btn-inquire btn-inquire-width"><span id="resetSearch" class="inline-block blue border-radius5 lh40px border-box textCenter" style="border: 0; letter-spacing: 2px;cursor: pointer">重置条件</span></p>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <!--<p class="btn-inquire mb20px">
+            <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" >新建</span>
+            <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter" >导出</span>
+        </p>
+        <div style="overflow: hidden;">
+            <p class="col-sm-2 right" style="padding: 0;">
+                <input type="text" class="form-control" id="username" name="username" placeholder="用户名" autofocus>
+                <span class="glyphicon glyphicon-search form-control-feedback lightGray" style="top:3px; right: 0;"></span>
+            </p >
+        </div>-->
+        <div class="overflow mb20px">
+            <p class="btn-inquire left">
+                <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" id="addArchives">新建</span>
+                <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter" id="exportArchives">导出</span>
+            </p >
+            <div style="overflow: hidden;">
+                <p class="col-sm-2 right" style="padding: 0;">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户姓名" autofocus>
+                    <span class="glyphicon glyphicon-search form-control-feedback lightGray" style="top:3px; right: 0;"></span>
+                </p >
+            </div>
+        </div>
+        <div class="table-con bgWhite border_box border-radius5">
+            <table cellpadding="0" cellspacing="0" width="100%" border="0" class="textCenter" id="main_table">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>姓名</th>
+                    <th>类别</th>
+                    <th>所属支部</th>
+                    <th>性别</th>
+                    <th>年龄</th>
+                    <th>部队类别</th>
+                    <th>干部类别</th>
+                    <th>现职级待遇</th>
+                    <th>政治面貌</th>
+                    <th>操作</th>
+                </tr>
+                </thead><tbody></tbody>
+            </table>
+            <div class="textCenter page-con">
+                <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10"  id="page"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="${#request.getContextPath()}+'/static/js/jquery-2.1.3.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/layer/layer.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/icheck.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/laydate/laydate.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/page.js'"></script>
+<script>
+    var basePath = $("input#basePathInput",parent.document).val();
+    var pageSize = 10;
+    var currentPage = 1;
+    var dataCount = 0;
+
+    $(function(){
+        $(".inquire-icheck input").iCheck({
+            checkboxClass: 'icheckbox_square-blue',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+
+        $("input.test-item1").each(function (i,v) {
+            let that = this;
+            laydate.render({
+                elem: this
+                ,type: 'year'
+                ,range: '-'
+                ,format: 'yyyy',
+                done: function(value, date, endDate){
+                    initSearchSpan(that,"input",value);
+                    getData(1);
+                }
+            });
+        })
+
+        let initPage = $("input#initPage").val();
+        if(initPage){
+            getData(initPage);
+        }else {
+            getData(1);
+        }
+        initEvent();
+    })
+    
+    function getData(page){
+        let data = {"currentPage":page,"pageSize":pageSize};
+        data.name = $("input#name").val();
+        data.liGong = $("select#liGong").val();
+        data.canZhan = $("select#canZhan").val();
+        data.branch = $("select#branch").val();
+        data.sex = $("select#sex").val();
+        data.nation = $("select#nation").val();
+        data.maritalStatus = $("select#maritalStatus").val();
+        data.invalidismIllnessLevel = $("select#invalidismIllnessLevel").val();
+        data.invalidismWarfareLevel = $("select#invalidismWarfareLevel").val();
+        data.invalidismCommunalLevel = $("select#invalidismCommunalLevel").val();
+        data.troopsType = $("select#troopsType").val();
+        data.caderType = $("select#caderType").val();
+        data.skillLevel = $("select#skillLevel").val();
+        data.dutiesLevel = $("select#dutiesLevel").val();
+        data.nowTreatment = $("select#nowTreatment").val();
+        data.specialSubsidy = $("select#specialSubsidy").val();
+        data.nursingExpenses = $("select#nursingExpenses").val();
+        data.longtermInsurance = $("select#longtermInsurance").val();
+        data.familyDoctor = $("select#familyDoctor").val();
+        data.purchaseJjga = $("select#purchaseJjga").val();
+        data.purchaseAkt = $("select#purchaseAkt").val();
+        data.age = $("select#age").val();
+        data.rwsj = $("input#joinupDate").val();
+        data.cjgzsj = $("input#startWorkDate").val();
+        data.jssj = $("input#receiveDate").val();
+        $.ajax({
+            url:basePath+"/archives/getData",
+            type:"post",
+            dataType:"json",
+            data:data,
+            success:function (result) {
+                let html = "";
+                if(result.code == 200){
+                    if(result.data && result.data.records && result.data.records.length > 0){
+                        $.each(result.data.records,function (i,v) {
+                            html += "<tr><td>"+((page - 1)*pageSize + i + 1)+"</td><td>"+v.name+"</td><td>"+((v.type == '1' || v.type == 1)?"退休":(v.type == '2' || v.type == 2)?"离休":"未知")+"</td><td>"+v.branch+"</td><td>"+((v.sex == '1' || v.sex == 1)?"男":(v.sex == '2' || v.sex == 2)?"女":"未知")+"</td><td>"+v.birth_date+"</td><td>"+v.troops_type+"</td><td>"+v.cader_type+"</td><td>"+v.now_treatment+"</td><td>"+((v.political_affiliation == '2' || v.political_affiliation == 2)?"党员":(v.political_affiliation == '9' || v.political_affiliation == 9)?"其他":"群众")+"</td><td><p class='operate-con blue table_operation'><span class='seeArchives' data-id='"+v.id+"'>查看</span><span class='editArchives' data-id='"+v.id+"'>编辑</span><span class='deleteArchives' data-id='"+v.id+"'>删除</span></p></td></tr>";
+                        })
+                        $("#page").initPage(result.data.total,result.data.current,result.data.pages,getData,result.data.size);
+                        currentPage = result.data.current;
+                        dataCount = result.data.records.length;
+                    }else{
+                        html += "<tr><td colspan='11'>暂无档案信息！</td></tr>";
+                    }
+                }else{
+                    html += "<tr><td colspan='11'>获取档案列表失败！</td></tr>";
+                }
+                $("table#main_table tbody").html(html);
+                $("span.seeArchives").unbind().on("click",function (e) {
+                    let id = $(this).data("id");
+                    window.location.href = basePath+"/archives/seeArchives?id="+id+"&initPage="+currentPage;
+                })
+                $("span.editArchives").unbind().on("click",function (e) {
+                    let id = $(this).data("id");
+                    window.location.href=basePath+"/archives/addOrEdit?initPage="+currentPage+"&id="+id;
+                })
+                $("span.deleteArchives").unbind().on("click",function (e) {
+                    let id = $(this).data("id");
+                    layer.confirm('是否确认删除该档案？', {
+                        btn: ['确定','取消']
+                    }, function(){
+                        layer.closeAll();
+                        deleteArchives(id);
+                    });
+                })
+            }
+        })
+    }
+
+    function deleteArchives(id) {
+        $.ajax({
+            url:basePath+"/archives/delete",
+            type:"post",
+            dataType:"json",
+            data:{"id":id},
+            success:function (result) {
+                layer.msg(result.msg);
+                if(result.code == 200){
+                    if(dataCount > 1) {
+                        getData(currentPage);
+                    }else{
+                        if(currentPage > 1){
+                            getData(parseInt(currentPage) - 1);
+                        }else{
+                            getData(currentPage);
+                        }
+                    }
+                }
+            }
+        })
+    }
+    
+    function initEvent() {
+        $("span#addArchives").on("click",function (e) {
+            window.location.href=basePath+"/archives/addOrEdit?initPage="+currentPage;
+        })
+
+        $("span#searchButton").on("click",function (e) {
+            getData(1);
+        })
+
+        $(".inquire-icheck input").on("ifChanged",function (e) {
+            let text = $(this).data("text");
+            if($(this).is(":checked")){
+                initSearchSpan(this,"icheck","ok",text);
+            }else{
+                initSearchSpan(this,"icheck",null,text);
+            }
+        })
+
+        $("select",$("div.search-ul")).on("change",function (e) {
+            initSearchSpan(this,"select");
+        })
+
+        $("span#resetSearch").on("click",function (e) {
+            $("li#searchSpanLi").html("");
+            $("input#name,input.test-item1").val("");
+            $("input[type='checkbox']").iCheck('uncheck');
+            $("select").val("");
+            getData(1);
+        })
+    }
+
+    function initSearchSpan(that,type,value,str) {
+        let text = "";
+        let val = "";
+        if(type == "select") {
+            text = $("option:selected", $(that)).text();
+            val = $("option:selected", $(that)).val();
+        }else{
+            val = $(that).val();
+            text = val;
+        }
+        if(value) {val = value;text = value;};
+        if(str){ val = value; text = str; }
+        let id = $(that).attr("id");
+        let field = $(that).data("field");
+        if(val){
+            let searchSpan = $("span#searchSpan_"+id);
+            if(searchSpan && searchSpan.length > 0){
+                $(searchSpan).prev().text(text);
+            }else{
+                $("li#searchSpanLi").append('<p class="inquire-cur"><span>'+field+'：</span><span class="blue">'+text+'</span><span id="searchSpan_'+id+'" data-id="'+id+'" data-type="'+type+'" class="closeSearch"><img src="'+basePath+'/static/img/close.png"></span></p>');
+                closeSearch();
+            }
+        }else{
+            $("span#searchSpan_"+id).parent().remove();
+        }
+    }
+
+    function closeSearch() {
+        $("span.closeSearch").unbind().on("click",function (e) {
+            let id = $(this).data("id");
+            let type = $(this).data("type");
+            if("icheck" == type){
+                $("#"+id).iCheck('uncheck');
+            }else{
+                $("#"+id).val("");
+            }
+            $(this).parent().remove();
+            getData(1);
+        })
+    }
+
+    function getNotNull(val) {
+        val = val + "";
+        if($.trim(val) && "null" != val){
+            return val;
+        }else{
+            return "";
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caifu.mapper.JxArchivesContributionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caifu.pojo.JxArchivesContribution">
+        <id column="ID" property="id" />
+        <result column="ARCHIVES_ID" property="archivesId" />
+        <result column="CONTRIBUTION_DATE" property="contributionDate" />
+        <result column="CONTRIBUTION_LEVEL" property="contributionLevel" />
+        <result column="REMARKS" property="remarks" />
+        <result column="STATUS" property="status" />
+    </resultMap>
+
+</mapper>

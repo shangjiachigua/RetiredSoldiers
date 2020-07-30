@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caifu.mapper.JxActivityMenberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caifu.pojo.JxActivityMenber">
+        <id column="ID" property="id" />
+        <result column="CREATE_BY" property="createBy" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="UPDATE_BY" property="updateBy" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="ACTIVITY_ID" property="activityId" />
+        <result column="NAME" property="name" />
+        <result column="MOBILE" property="mobile" />
+        <result column="ACCOMPANYING_NUMBER" property="accompanyingNumber" />
+        <result column="ACCOMPANYING_NAMES" property="accompanyingNames" />
+        <result column="REMARKS" property="remarks" />
+        <result column="STATUS" property="status" />
+        <result column="CANCEL_TIME" property="cancelTime" />
+        <result column="USER_NO" property="userNo" />
+    </resultMap>
+
+</mapper>

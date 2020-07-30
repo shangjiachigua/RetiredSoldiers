@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css"th:href="${#request.getContextPath()}+'/static/bootstrap/css/bootstrap.min.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/normalize.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/iconfont.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/rightCon.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/thesame.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/popUp.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/page.css'"/>
+    <style type="text/css">
+        .table_operation span{cursor: pointer}
+    </style>
+</head>
+<body>
+<input id="initPage" th:value="${initPage}" type="hidden">
+<div class="right-Sidebar-con border-box">
+    <div>
+        <p class="btn-inquire mb20px table_operation">
+            <span class="inline-block bgBlue white border-radius5 lh40px border-box textCenter mr15px" id="addUser">新建</span>
+        </p>
+        <div class="table-con bgWhite border_box border-radius5">
+            <table cellpadding="0" cellspacing="0" width="100%" border="0" class="textCenter" id="main_table">
+                <thead>
+                <tr>
+                    <th style="width: 15%">用户账号</th>
+                    <th style="width: 15%">用户姓名</th>
+                    <th style="width: 20%">创建时间</th>
+                    <th style="width: 20%">最近登录时间</th>
+                    <th style="width: 30%">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <div class="textCenter page-con">
+                <ul class="page inline-block" maxshowpageitem="5" pagelistcount="10"  id="page"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="${#request.getContextPath()}+'/static/js/jquery-2.1.3.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/layer/layer.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/page.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/validation/jquery.validate.js'"></script>
+<script>
+    var basePath = $("input#basePathInput",parent.document).val();
+    var pageSize = 10;
+    var currentPage = 1;
+    var dataCount = 0;
+
+    jQuery.validator.addMethod("alnum", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9]{0,20}$/.test(value);
+    }, "只支持英文字母和数字！");
+
+    $(function(){
+        initEvent();
+        var initPage = $("input#initPage").val();
+        if(initPage){
+            getData(initPage);
+        }else {
+            getData(1);
+        }
+    })
+
+    function getData(page){
+        $.ajax({
+            url:basePath+"/user/getUserList",
+            type:"post",
+            dataType:"json",
+            data:{"currentPage":page,"pageSize":pageSize},
+            success:function (result) {
+                var html = "";
+                if(result.code == 200){
+                    if(result.data && result.data.records && result.data.records.length > 0){
+                        $.each(result.data.records,function (i,v) {
+                            html += "<tr><td>"+v.loginName+"</td><td>"+v.userName+"</td><td>"+getNotNull(v.createTime)+"</td><td>"+getNotNull(v.loginTime)+"</td><td><p class='operate-con blue table_operation'><span class='jurisdiction' data-id='"+v.userNo+"'>权限配置</span><span class='resetPassword' data-id='"+v.userNo+"'>重置密码</span><span class='editUser' data-id='"+v.userNo+"'>编辑</span><span class='deleteUser' data-id='"+v.userNo+"'>删除</span></p></td></tr>";
+                        })
+                        $("#page").initPage(result.data.total,result.data.current,result.data.pages,getData,result.data.size);
+                        currentPage = result.data.current;
+                        dataCount = result.data.records.length;
+                    }else{
+                        html += "<tr><td colspan='5'>暂无用户信息！</td></tr>";
+                    }
+                }else{
+                    html += "<tr><td colspan='5'>获取用户列表失败！</td></tr>";
+                }
+                $("table#main_table tbody").html(html);
+                $("span.jurisdiction").unbind().on("click",function (e) {
+                    var id = $(this).data("id");
+                    window.location.href = basePath+"/user/userMenu?userNo="+id+"&userPage="+currentPage;
+                })
+                $("span.resetPassword").unbind().on("click",function (e) {
+                    var id = $(this).data("id");
+                    layer.confirm('是否确认重置密码为 111111 ？', {
+                        btn: ['确定','取消']
+                    }, function(){
+                        layer.closeAll();
+                        resetPassword(id);
+                    });
+                })
+                $("span.editUser").unbind().on("click",function (e) {
+                    var id = $(this).data("id");
+                    layerOpen(id);
+                })
+                $("span.deleteUser").unbind().on("click",function (e) {
+                    var id = $(this).data("id");
+                    layer.confirm('是否确认删除该用户？', {
+                        btn: ['确定','取消']
+                    }, function(){
+                        layer.closeAll();
+                        deleteUser(id);
+                    });
+                })
+            }
+        })
+    }
+
+    function getUserById(id,scope) {
+        $.ajax({
+            url:basePath+"/user/getUserById",
+            type:"post",
+            dataType:"json",
+            data:{"userNo":id},
+            success:function (result) {
+                if(result.code == 200){
+                    $("input#userNo",scope).val(result.data.userNo);
+                    $("input#userName",scope).val(result.data.userName);
+                    $("input#loginName",scope).val(result.data.loginName);
+                }else{
+                    layer.closeAll();
+                    layer.msg(result.msg);
+                }
+            }
+        })
+    }
+
+    function resetPassword(id) {
+        $.ajax({
+            url:basePath+"/user/resetPassword",
+            type:"post",
+            dataType:"json",
+            data:{"userNo":id},
+            success:function (result) {
+                layer.msg(result.msg);
+                if(result.code == 200){
+                    getData(currentPage)
+                }
+            }
+        })
+    }
+
+    function deleteUser(id) {
+        $.ajax({
+            url:basePath+"/user/delete",
+            type:"post",
+            dataType:"json",
+            data:{"userNo":id},
+            success:function (result) {
+                layer.msg(result.msg);
+                if(result.code == 200){
+                    if(dataCount > 1) {
+                        getData(currentPage);
+                    }else{
+                        if(currentPage > 1){
+                            getData(parseInt(currentPage) - 1);
+                        }else{
+                            getData(currentPage);
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    function initEvent() {
+        $("span#addUser").on("click",function (e) {
+            layerOpen();
+        })
+    }
+
+    function layerOpen(id) {
+        var layerIndex = layer.open({
+            type: 1,
+            title: false,
+            closeBtn: false,
+            skin: 'layui-layer-rim', //加上边框
+            area: ['700px', ''], //宽高
+            content: layerHtml,
+            success:function(){
+                var scope = $("div#layerHtmlDiv");
+                var form = $("form#userForm",scope);
+                if(id){
+                    getUserById(id,scope);
+                }
+                $(form).validate(
+                    {
+                        rules:{
+                            loginName:{required:true,maxlength:20,alnum:true},
+                            userName:{required:true,maxlength:10}
+                        },
+                        messages:{
+                            loginName:{required:"用户账号不能为空！",maxlength:"用户账号最多20位！"},
+                            userName:{
+                                required:"用户姓名不能为空！",
+                                maxlength:"用户姓名最多10个字符！",
+                            }
+                        }
+                    }
+                )
+
+                $(".close-btn",scope).unbind().on("click",function(e){
+                    layer.closeAll();
+                });
+
+                $("span#userSave").unbind().on("click",function (e) {
+                    if($(form).valid()){
+                        var userNo = $("input#userNo").val();
+                        var loginName = $("input#loginName").val();
+                        var userName = $("input#userName").val();
+                        $.ajax({
+                            url:basePath + "/user/save",
+                            type:"post",
+                            dataType:"json",
+                            data:{"userNo":userNo,"userName":userName,"loginName":loginName},
+                            success:function (result) {
+                                layer.msg(result.msg);
+                                if(result.code == 200){
+                                    getData(1);
+                                    layer.close(layerIndex);
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        });
+    }
+
+    function getNotNull(val) {
+        val = val + "";
+        if($.trim(val) && "null" != val){
+            return val;
+        }else{
+            return "";
+        }
+    }
+
+    var layerHtml = '<div class="popUp" id="layerHtmlDiv">\n' +
+        '<ul class="pop-ul textCenter f18px fb relative">\n' +
+        '<li><span>用户信息</span></li>\n' +
+        '<p><span class="close-btn"><img src="'+basePath+'/static/img/close.png"></span></p>\n' +
+        '</ul>\n' +
+        '<div class="form-con">\n' +
+        '<form class="form-horizontal" id="userForm" role="form">\n' +
+        '<input type="hidden" name="userNo" id="userNo" /> '+
+        '<div class="form-group row">\n' +
+        '<label class="col-sm-3 control-label"><span class="red">* </span>用户账号</label>\n' +
+        '<div class="col-sm-9">\n' +
+        '<input type="text" name="loginName" id="loginName" class="form-control" maxlength="20" autocomplete="off" placeholder="请输入用户账号">\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '<div class="form-group row">\n' +
+        '<label class="col-sm-3 control-label"><span class="red">* </span>用户姓名</label>\n' +
+        '<div class="col-sm-9">\n' +
+        '<input type="text" name="userName" id="userName" class="form-control" maxlength="10" autocomplete="off" placeholder="请输入用户姓名">\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '</form>\n' +
+        '<div class="btn-bot textCenter">\n' +
+        '<p class="inline-block textCenter overflow">\n' +
+        '<span class="bgBlue white" id="userSave">保存</span><span class="bgGray close-btn">取消</span>\n' +
+        '</p>\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '</div>';
+</script>
+</body>
+</html>

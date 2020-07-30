@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <link rel="stylesheet" type="text/css"th:href="${#request.getContextPath()}+'/static/bootstrap/css/bootstrap.min.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/normalize.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/iconfont.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/rightCon.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/thesame.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/popUp.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/icheck.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/page.css'"/>
+    <style type="text/css">
+        span{cursor: pointer}
+        label.error{max-width: none;width: 300px}
+        input[type='radio'] + label.error,input[type='checkbox'] + label.error{
+            margin-top: 20px;
+        }
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<input id="initPage" th:value="${initPage}" type="hidden">
+<div class="right-Sidebar-con border-box">
+    <div class="record-compile-con">
+        <div class="bgWhite border-radius5 box-shadows mb5px overflow">
+            <span class="left pad20" style="border-right: 3px solid #F0EFF5; height: 65px;"><img th:src="${#request.getContextPath()}+'/static/img/return.png'" class="block"></span>
+            <span class="left pad20 f18px fb">新建档案</span>
+        </div>
+        <!--基本信息-->
+        <form id="jibenxinxiForm">
+            <input type="hidden" name="id" id="id" th:value="${id}"/>
+            <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative lh35px"><span class="fb">基本信息</span></h1>
+            <nav class="record-inform">
+                <ul>
+                    <li class="overflow">
+                        <div class="record-file">
+								<span>
+									<input type="file" name="photo" id="photo" class="hidden file"/>
+									<img th:src="${#request.getContextPath()}+'/static/img/tx.png'" id="photoImg" class="filejs border-radius4" />
+								</span>
+                            <span class="bgBlue white border-radius5 lh35px inline-block textCenter ml30px" id="addPhoto">上传图片</span>
+                        </div>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>姓名：</label></p>
+                        <p><input type="text" name="name" autocomplete="off"  class="form-control" placeholder="请输入姓名" autofocus></p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>性别：</label></p>
+                        <p>
+                            <select name="sex" class="form-control form-select">
+                                <option value="1">男</option>
+                                <option value="2">女</option>
+                            </select>
+                        </p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>出生日期：</label></p>
+                        <p><input type="text" name="birthDate" readonly autocomplete="off"  class="form-control record-time" placeholder="请选择出生日期"></p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>身份证：</label></p>
+                        <p><input type="text" name="certificateNumber" autocomplete="off"  class="form-control" placeholder="请输入姓名"></p>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <p><span class="red">*</span><label>类别：</label></p>
+                        <p>
+                            <select name="type" class="form-control form-select">
+                                <option value="">请选择</option>
+                                <option value="1">退休</option>
+                                <option value="2">离休</option>
+                            </select>
+                        </p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>所属支部：</label></p>
+                        <p>
+                            <select name="branch" class="form-control form-select">
+                                <option value="">请选择</option>
+                                <option th:each ="zb,zbStat : ${zhibu}" th:value="${zb.id}">[[${zb.name}]]</option>
+                            </select>
+                        </p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>民族：</label></p>
+                        <p>
+                            <select name="nation" class="form-control form-select">
+                                <option value="">请选择</option>
+                                <option th:each ="mz,mzStat : ${minzu}" th:value="${mz.id}">[[${mz.name}]]</option>
+                            </select>
+                        </p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>婚姻状况：</label></p>
+                        <p>
+                            <select name="maritalStatus" class="form-control form-select">
+                                <option value="">请选择</option>
+                                <option th:each ="hyzk,hyzkStat : ${hunyingzhuangkuang}" th:value="${hyzk.id}">[[${hyzk.name}]]</option>
+                            </select>
+                        </p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>文化程度：</label></p>
+                        <p>
+                            <select name="educationalLevel" class="form-control form-select">
+                                <option value="">请选择</option>
+                                <option th:each ="whcd,whcdStat : ${wenhuachengdu}" th:value="${whcd.id}">[[${whcd.name}]]</option>
+                            </select>
+                        </p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>户籍地址：</label></p>
+                        <p><input type="text" name="householdRegistration" autocomplete="off" class="form-control" placeholder="请输入户籍地址"></p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>现居住地址：</label></p>
+                        <p><input type="text" name="resideAddress" autocomplete="off" class="form-control" placeholder="请输入现居住地址"></p>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <p><span class="red">*</span><label>手机号：</label></p>
+                        <p><input type="text" name="phoneNumber" autocomplete="off" class="form-control" placeholder="请输入手机号"></p>
+                    </li>
+                    <li>
+                        <p><label>固定电话：</label></p>
+                        <p><input type="text" name="telNumber" autocomplete="off" class="form-control" placeholder="请输入固定电话"></p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>政治面貌：</label></p>
+                        <p class="inquire-icheck">
+                            <span class="mr15px"><input type="radio" name="politicalAffiliation" id="one" value="2" /><label for="one" class="ml10px">中共党员</label></span>
+                            <span class="mr15px"><input type="radio" name="politicalAffiliation" id="two" value="1" /><label for="two" class="ml10px">群众</label></span>
+                            <span class="mr15px"><input type="radio" name="politicalAffiliation" id="three" value="9"/><label for="three" class="ml10px">其他</label></span>
+                        </p>
+                    </li>
+                    <li id="politicalExplainLi" style="display: none;">
+                        <p><span class="red">*</span><label>具体内容：</label></p>
+                        <p><input type="text" name="politicalExplain" maxlength="20" autocomplete="off" class="form-control" placeholder="具体内容">
+                            <label style="display: none" id="politicalExplain-error" class="error"></label>
+                        </p>
+                    </li>
+                    <li id="joinpartyDateLi" style="display: none">
+                        <p><span class="red">*</span><label>入党时间：</label></p>
+                        <p><input type="text" name="joinpartyDate" readonly autocomplete="off" class="form-control record-time" placeholder="请选择入党时间">
+                            <label style="display: none" id="joinpartyDate-error" class="error"></label></p>
+                    </li>
+                    <li>
+                        <p><span class="red">*</span><label>当前状态：</label></p>
+                        <p class="inquire-icheck">
+                            <span class="mr15px"><input type="radio" name="aliveStatus" id="jz" value="1" /><label for="jz" class="ml10px">健在</label></span>
+                            <span class="mr15px"><input type="radio" name="aliveStatus" id="qs" value="2" /><label for="qs" class="ml10px">过世</label></span>
+                        </p>
+                    </li>
+                    <li id="deathDateLi" style="display: none">
+                        <p><span class="red">*</span><label>离世时间：</label></p>
+                        <p><input type="text" name="deathDate" autocomplete="off" readonly class="form-control record-time" placeholder="离世时间">
+                            <label style="display: none" id="deathDate-error" class="error"></label>
+                        </p>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        </form>
+        <!--家庭成员-->
+        <form id="jiatingchengyuanForm">
+            <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative overflow lh35px"><span class="fb">家庭成员</span><span class="right bgBlue white border-radius5 pl20px pr20px f16px" id="addFamily">添加</span></h1>
+            <div class="record-compile-table">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" class="textCenter" id="familyTable">
+                    <thead>
+                    <tr class="textCenter">
+                        <th><span class="red">*</span>姓名</th>
+                        <th><span class="red">*</span>家庭关系</th>
+                        <th><span class="red">*</span>联系方式</th>
+                        <th>紧急联系人</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </form>
+        <!--健康状况-->
+        <form id="jiankangzhuangkuangForm">
+            <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative overflow lh35px"><span class="fb">健康状况</span></h1>
+            <nav class="record-great">
+                <ul>
+                    <li>
+                        <div><label>重大疾病：</label></div>
+                        <div><input type="text" name="seriousDisease" autocomplete="off" class="form-control" placeholder="请输入重大疾病" autofocus></div>
+                    </li>
+                    <li>
+                        <div><label>伤残情况：</label></div>
+                        <div class="overflow">
+                            <div class="form-inline">
+                                <p class="inquire-icheck form-group">
+                                    <span class="mr20px"><input type="checkbox" name="invalidismCommunal"/><label class="ml10px">因工伤残</label></span>
+                                </p>
+                                <p class="form-group">
+                                    <select disabled name="invalidismCommunalLevel" class="form-control form-select">
+                                        <option value="">伤残级别</option>
+                                        <option th:each ="scjb,scjbStat : ${shangcandengji}" th:value="${scjb.id}">[[${scjb.name}]]</option>
+                                    </select>
+                                </p>
+                            </div>
+                            <div class="form-inline">
+                                <p class="inquire-icheck form-group">
+                                    <span class="mr20px"><input type="checkbox" name="invalidismIllness" /><label class="ml10px">因病伤残</label></span>
+                                </p>
+                                <p class="form-group">
+                                    <select disabled name="invalidismIllnessLevel" class="form-control form-select">
+                                        <option value="">伤残级别</option>
+                                        <option th:each ="scjb,scjbStat : ${shangcandengji}" th:value="${scjb.id}">[[${scjb.name}]]</option>
+                                    </select>
+                                </p>
+                            </div>
+                            <div class="form-inline">
+                                <p class="inquire-icheck form-group">
+                                    <span class="mr20px"><input type="checkbox"name="invalidismWarfare"/><label class="ml10px">因战伤残</label></span>
+                                </p>
+                                <p class="form-group">
+                                    <select disabled name="invalidismWarfareLevel" class="form-control form-select">
+                                        <option value="">伤残级别</option>
+                                        <option th:each ="scjb,scjbStat : ${shangcandengji}" th:value="${scjb.id}">[[${scjb.name}]]</option>
+                                    </select>
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        </form>
+        <!--军旅生涯-->
+        <form id="junlvshengyaForm">
+            <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative overflow lh35px"><span class="fb">军旅生涯</span></h1>
+            <div>
+                <nav class="record-inform">
+                    <ul>
+                        <li>
+                            <p><span class="red">*</span><label>入伍时间：</label></p>
+                            <p><input type="text" name="joinupDate" readonly class="form-control record-time" placeholder="请选择入伍时间"></p>
+                        </li>
+                        <li>
+                            <p><span class="red">*</span><label>原部职别：</label></p>
+                            <p><input type="text" name="troopsDuties" autocomplete="off" class="form-control" placeholder="请输入姓名"></p>
+                        </li>
+                        <li>
+                            <p><label>军衔文级：</label></p>
+                            <p><input type="text" name="militaryRank" autocomplete="off" class="form-control" placeholder="请输入姓名"></p>
+                        </li>
+                        <li>
+                            <p><span class="red">*</span><label>职务等级：</label></p>
+                            <p>
+                                <select name="dutiesLevel" class="form-control form-select">
+                                    <option value="">请选择</option>
+                                    <option th:each ="zwdj,zwdjStat : ${zhiwudengji}" th:value="${zwdj.id}">[[${zwdj.name}]]</option>
+                                </select>
+                            </p>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <p><label>参加工作时间：</label></p>
+                            <p><input name="startWorkDate" readonly type="text" class="form-control record-time" placeholder="请选择参加工作时间"></p>
+                        </li>
+                        <li>
+                            <p><span class="red">*</span><label>部队类别：</label></p>
+                            <p>
+                                <select name="troopsType" class="form-control form-select">
+                                    <option value="">请选择</option>
+                                    <option th:each ="bdlb,bdlbStat : ${buduileibie}" th:value="${bdlb.id}">[[${bdlb.name}]]</option>
+                                </select>
+                            </p>
+                        </li>
+                        <li>
+                            <p><span class="red">*</span><label>干部类别：</label></p>
+                            <p>
+                                <select name="caderType" class="form-control form-select">
+                                    <option value="">请选择</option>
+                                    <option th:each ="gblb,gblbStat : ${ganbuleibie}" th:value="${gblb.id}">[[${gblb.name}]]</option>
+                                </select>
+                            </p>
+                        </li>
+                        <li>
+                            <p><span class="red">*</span><label>现职级待遇：</label></p>
+                            <p>
+                                <select name="nowTreatment" class="form-control form-select">
+                                    <option value="">请选择</option>
+                                    <option th:each ="xzjdy,xzjdyStat : ${xianzhijidaiyu}" th:value="${xzjdy.id}">[[${xzjdy.name}]]</option>
+                                </select>
+                            </p>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <p><span class="red">*</span><label>离/退休时间：</label></p>
+                            <p><input type="text" name="endWorkDate" readonly class="form-control record-time" placeholder="请选择离/退休时间"></p>
+                        </li>
+                        <li>
+                            <p><span class="red">*</span><label>接收时间：</label></p>
+                            <p><input type="text" name="receiveDate" readonly class="form-control record-time" placeholder="请选择接收时间"></p>
+                        </li>
+                        <li>
+                            <p><label>技术等级：</label></p>
+                            <p>
+                                <select name="skillLevel" class="form-control form-select">
+                                    <option value="">请选择</option>
+                                    <option th:each ="jsdj,jsdjStat : ${jishudengji}" th:value="${jsdj.id}">[[${jsdj.name}]]</option>
+                                </select>
+                            </p>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="record-add record-div lh35px">
+                    <p class="fb">参战情况：</p>
+                    <p class="cursor duoxuan" id="canzhanqingkuang">
+                     <!--   <span class="current">朝鲜战争</span><span>越南战争</span><span>添加</span>-->
+                        <span th:each ="zy,zyStat : ${zhanyi}" th:data-val="${zy.id}">[[${zy.name}]]</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        </form>
+        <!--立功情况-->
+        <form id="ligongqingkuangForm">
+            <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative overflow lh35px"><span class="fb">立功情况</span><span class="right bgBlue white border-radius5 pl20px pr20px f16px" id="addLiGong">添加</span></h1>
+            <div class="record-compile-table record-compile-table-width">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" class="textCenter" id="liGongTable">
+                    <thead>
+                    <tr class="textCenter">
+                        <th><span class="red">*</span>立功时间</th>
+                        <th><span class="red">*</span>立功等级</th>
+                        <th>授奖情况详情</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </form>
+        <!--其他信息-->
+        <form id="qitaxinxiForm">
+            <div class="bgWhite border-radius5 box-shadows mb20px">
+            <h1 class="record-compile-title relative overflow lh35px"><span class="fb">其他信息</span></h1>
+            <nav class="record-add record-nav lh35px">
+                <ul>
+                    <li>
+                        <p class="fb">享受福利：</p>
+                        <p class="cursor duoxuan filedSelectP">
+                            <span data-filed="specialSubsidy">享受国务院特殊津贴</span>
+                            <span data-filed="longtermInsurance">享受长护险</span>
+                            <span data-filed="familyDoctor">享受家庭医生</span>
+                            <span data-filed="nursingExpenses" id="xiangshouhulifei">享受护理费</span>
+                            <span style="background: none; padding: 0; border: 0; width: auto;">
+								    <label>护理开始时间：</label>
+								    <input name="nurseStartDate" readonly style="width: auto; display: inline-block;" type="text" class="form-control record-time" placeholder="请选择护理开始时间">
+                                    <label style="display: none" id="nurseStartDate-error" class="error">请选择护理开始时间！</label>
+								</span>
+                        </p>
+                    </li>
+                    <li>
+                        <p class="fb">购买保险：</p>
+                        <p class="cursor duoxuan filedSelectP">
+                            <span data-filed="purchaseJjga">久久关爱</span><span data-filed="purchaseAkt">安康通</span></p>
+                    </li>
+                    <li>
+                        <p class="fb">特殊情况：</p>
+                        <p class="cursor duoxuan" id="teshuqingkuang">
+                            <span th:each ="ts,tsStat : ${teshuqingkuang}" th:data-val="${ts.id}">[[${ts.name}]]</span>
+                        </p>
+                    </li>
+                    <li>
+                        <p class="fb">备注：</p>
+                        <p><textarea name="remarks" class="form-control" rows="4" style="width: 100%;"></textarea></p>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        </form>
+        <div class="btn-bot textCenter pt30px pb30px">
+            <p class="inline-block textCenter overflow">
+                <span class="bgBlue white mr30px" id="saveArchives">保存</span><span class="bgGray">取消</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script th:src="${#request.getContextPath()}+'/static/js/jquery-2.1.3.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/layer/layer.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/icheck.min.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/js/page.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/validation/jquery.validate.js'"></script>
+<script th:src="${#request.getContextPath()}+'/static/laydate/laydate.js'"></script>
+<script>
+    var basePath = $("input#basePathInput",parent.document).val();
+    var jiatingguanxi;
+    var ligongdengji;
+
+    jQuery.validator.addMethod("num18", function(value, element) {
+        return this.optional(element) || /^([0-9]{18}|[0-9]{17}[Xx]{1})$/.test(value);
+    }, "请输入正确的身份证号！");
+    jQuery.validator.addMethod("t_mobile", function(value, element) {
+        return this.optional(element) || /^1[1-9]{1}[0-9]{9}$/.test(value);
+    }, "请输入正确的手机号！");
+    jQuery.validator.addMethod("t_tel", function(value, element) {
+        return this.optional(element) || /^([0-9]{10,12}|[0-9]{3,4}-[0-9]{7,8})$/.test(value);
+    }, "请输入正确的座机号！");
+    jQuery.validator.addMethod("contactInformation", function(value, element) {
+        return this.optional(element) || /^(1[1-9]{1}[0-9]{9}|[0-9]{10,12}|[0-9]{3,4}-[0-9]{7,8})$/.test(value);
+    }, "请输入正确的联系方式！");
+
+    $(function(){
+        let id = $("input#id").val();
+        if(id){
+            get(id);
+        }
+
+        $(".inquire-icheck input").iCheck({
+            checkboxClass: 'icheckbox_square-blue',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+        init();
+    })
+
+    function init() {
+        $("form#jibenxinxiForm").validate(
+            {
+                rules:{
+                    name:{required:true,maxlength:10},
+                    sex:{required:true},
+                    birthDate:{required:true},
+                    certificateNumber:{required:true,num18:true},
+                    type:{required:true},
+                    branch:{required:true},
+                    nation:{required:true},
+                    maritalStatus:{required:true},
+                    educationalLevel:{required:true},
+                    householdRegistration:{required:true,maxlength:100},
+                    resideAddress:{required:true,maxlength:100},
+                    phoneNumber:{required:true,t_mobile:true},
+                    telNumber:{t_tel:true},
+                    politicalAffiliation:{required:true},
+                    aliveStatus:{required:true}
+                },
+                messages:{
+                    name:{required:"请填写姓名！",maxlength:"姓名最大长度为10个字符！"},
+                    sex:{required:"请选择性别！"},
+                    birthDate:{required:"请选择出生日期！"},
+                    certificateNumber:{required:"请填写身份证号！"},
+                    type:{required:"请选择类别！"},
+                    branch:{required:"请选择所属支部！"},
+                    nation:{required:"请选择民族！"},
+                    maritalStatus:{required:"请选择婚姻状况！"},
+                    educationalLevel:{required:"请选择文化程度！"},
+                    householdRegistration:{required:"请填写户籍地址！",maxlength:"户籍地址最大长度为100个字符"},
+                    resideAddress:{required:"请填写现居住地址！",maxlength:"现居住地址最大长度为100个字符"},
+                    phoneNumber:{required:"请填写手机号！"},
+                    telNumber:{required:"请填写手机号！"},
+                    politicalAffiliation:{required:"请选择政治面貌！"},
+                    aliveStatus:{required:"请选择当前状态！"}
+                }
+            }
+        )
+
+        $("form#jiatingchengyuanForm").validate(
+            {
+                rules:{
+                    familyName:{required:true,maxlength:10},
+                    familyRelation:{required:true},
+                    familyPhone:{required:true,contactInformation:true}
+                },
+                messages:{
+                    familyName:{required:"请填写姓名！",maxlength:"姓名最大长度为10个字符！"},
+                    familyRelation:{required:"请选择家庭关系！"},
+                    familyPhone:{required:"请填写联系方式！"}
+                }
+            }
+        )
+
+        $("form#ligongqingkuangForm").validate(
+            {
+                rules:{
+                    liGongTime:{required:true},
+                    liGongLevel:{required:true},
+                    liGongOther:{maxlength:50}
+                },
+                messages:{
+                    liGongTime:{required:"请选择立功时间！"},
+                    liGongLevel:{required:"请选择立功等级！"},
+                    liGongOther:{maxlength:"授奖情况详情最多为50个字符！"}
+                }
+            }
+        )
+
+        $("form#jiankangzhuangkuangForm").validate(
+            {
+                rules:{
+                    seriousDisease:{maxlength:50}
+                },
+                messages:{
+                    seriousDisease:{maxlength:"重大疾病最大长度为10个字符！"}
+                }
+            }
+        )
+
+        $("form#junlvshengyaForm").validate(
+            {
+                rules:{
+                    joinupDate:{required:true},
+                    troopsDuties:{required:true,maxlength:20},
+                    militaryRank:{maxlength:20},
+                    dutiesLevel:{required:true},
+                    troopsType:{required:true},
+                    caderType:{required:true},
+                    nowTreatment:{required:true},
+                    endWorkDate:{required:true},
+                    receiveDate:{required:true}
+                },
+                messages:{
+                    joinupDate:{required:"请选择入伍时间！"},
+                    troopsDuties:{required:"请填写原部职别！",maxlength:"原部职别最大长度为10个字符！"},
+                    militaryRank:{maxlength:"军衔文级最大长度为10个字符！"},
+                    dutiesLevel:{required:"请选择职务等级！"},
+                    troopsType:{required:"请选择部队类别！"},
+                    caderType:{required:"请选择干部类别！"},
+                    nowTreatment:{required:"请选择现职级待遇！"},
+                    endWorkDate:{required:"请选择离/退休时间！"},
+                    receiveDate:{required:"请选择接收时间！"},
+                }
+            }
+        )
+
+        $("form#qitaxinxiForm").validate(
+            {
+                rules:{
+                    remarks:{maxlength:200}
+                },
+                messages:{
+                    remarks:{maxlength:"备注最多支持200个字符！"}
+                }
+            }
+        )
+
+        $.ajax({
+            url:basePath+"/archives/initData",
+            type:"post",
+            dataType:"json",
+            success:function (result) {
+                if(result.code == 200){
+                    jiatingguanxi = result.data.jiatingguanxi;
+                    ligongdengji = result.data.ligongdengji;
+                }else{
+                    layer.msg("初始化家庭关系和立功等级数据失败！")
+                }
+            }
+        })
+
+        $("input.record-time").each(function (i,v) {
+            laydate.render({
+                elem: this
+            });
+        })
+
+        $("p.duoxuan span").on("click",function (e) {
+            if($(this).hasClass("current")){
+                $(this).removeClass("current");
+            }else{
+                $(this).addClass("current");
+            }
+        })
+        
+        $("span#addPhoto").on("click",function (e) {
+            $("input#photo").trigger("click");
+        })
+
+        $("input#photo").on("change",function (e) {
+            let file = this.files[0];
+            let r = new FileReader();
+            r.readAsDataURL(file);
+            $(r).load(function() {
+                $("img#photoImg").attr('src',this.result);
+            });
+        })
+
+        $("span#addFamily").on("click",function (e) {
+            if($("form#jiatingchengyuanForm").valid()) {
+                $("label#familyName-error,label#familyRelation-error,label#familyPhone-error").remove();
+                let html = '<tr><td><p><input type="text" name="familyName" autocomplete="off" class="form-control" placeholder="请输入姓名" autofocus></p></td><td><p><select name="familyRelation" class="form-control form-select"><option value="">请选择</option>';
+                if(jiatingguanxi && jiatingguanxi.length > 0){
+                    $.each(jiatingguanxi,function (i,v) {
+                        html += " <option value='"+v.id+"'>"+v.name+"</option>"
+                    })
+                }
+                html += '</select></p></td><td><p><input type="text" name="familyPhone" autocomplete="off" class="form-control" placeholder="请输入联系方式" autofocus></p></td><td><p class="inquire-icheck"><input type="checkbox" name="familyJjlxr" value="1" /></p></td><td><p class="delete-img" id="deleteFamily"><span><img src="' + basePath + '/static/img/shanchu.png" class="block"></span></p></td></tr>';
+                $("table#familyTable tbody").prepend(html);
+
+                $("p#deleteFamily").unbind().on("click", function (e) {
+                    $(this).parent().parent().remove();
+                })
+                $(".inquire-icheck input").iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue',
+                    increaseArea: '20%' // optional
+                });
+            }
+
+        })
+
+        $("span#addLiGong").on("click",function (e) {
+            if($("form#ligongqingkuangForm").valid()) {
+                $("label#liGongTime-error,label#liGongLevel-error").remove();
+                let html = '<tr><td><p><input type="text" name="liGongTime" readonly class="form-control record-time" placeholder="请选择立功时间" autofocus></p></td><td><p><select name="liGongLevel" class="form-control form-select"><option value="">请选择</option>';
+                if(ligongdengji && ligongdengji.length > 0){
+                    $.each(ligongdengji,function (i,v) {
+                        html += " <option value='"+v.id+"'>"+v.name+"</option>";
+                    })
+                }
+                html += '</select></p></td><td><p><input type="text" name="liGongOther" autocomplete="off" class="form-control" placeholder="请输入授奖情况详情" autofocus></p></td><td><p class="delete-img" id="deleteLiGong"><span><img src="' + basePath + '/static/img/shanchu.png" class="block"></span></p></td></tr>';
+                $("table#liGongTable tbody").prepend(html);
+
+                $("p#deleteLiGong").unbind().on("click", function (e) {
+                    $(this).parent().parent().remove();
+                })
+                $(".inquire-icheck input").iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue',
+                    increaseArea: '20%' // optional
+                });
+                $("input.record-time",$("table#liGongTable tbody tr").eq(0)).each(function (i,v) {
+                    laydate.render({
+                        elem: this,
+                        type:"year"
+                    });
+                })
+            }
+        })
+
+        $("span#saveArchives").on("click",function (e) {
+            var photo = $("input#photo").val();
+            console.info(photo);
+            var flag = true;
+            if(!$("form#jibenxinxiForm").valid()){
+                flag = false;
+            }
+            if(!$("form#jiatingchengyuanForm").valid()){
+                flag = false;
+            }
+            if(!$("form#jiankangzhuangkuangForm").valid()){
+                flag = false;
+            }
+            if(!$("form#junlvshengyaForm").valid()){
+                flag = false;
+            }
+            if(!$("form#ligongqingkuangForm").valid()){
+                flag = false;
+            }
+            if(!$("form#qitaxinxiForm").valid()){
+                flag = false;
+            }
+            if(flag) {
+                var val = $("input[name='politicalAffiliation']:checked").val();
+                if (val == "2") {
+                    $("input[name='politicalExplain']").val("");
+                    if ($("input[name='joinpartyDate']").val()) {
+                        $("label#joinpartyDate-error").text("请选择入党时间！").css("display", "inline-block");
+                    } else {
+                        $("label#joinpartyDate-error").text("").css("display", "none");
+                    }
+                } else if (val == "9") {
+                    $("input[name='joinpartyDate']").val("");
+                    if ($("input[name='politicalExplain']").val()) {
+                        $("label#politicalExplain-error").text("请填写具体类容！").css("display", "inline-block");
+                    } else {
+                        $("label#politicalExplain-error").text("").css("display", "none");
+                    }
+                } else {
+                    $("input[name='joinpartyDate']").val("");
+                    $("input[name='politicalExplain']").val("");
+                    $("label#joinpartyDate-error").text("").css("display", "none");
+                    $("label#politicalExplain-error").text("").css("display", "none");
+                }
+
+                if ($("span#xiangshouhulifei").hasClass("current")) {
+                    if (!$("input[name='nurseStartDate']").val()) {
+                        flag = false;
+                        $("label#nurseStartDate-error").css("display", "inline-block");
+                    } else {
+                        $("label#nurseStartDate-error").css("display", "none");
+                    }
+                }
+
+                val = $("input[name='aliveStatus']:checked").val();
+                if (val == "2") {
+                    if ($("input[name='deathDate']").val()) {
+                        $("label#deathDate-error").text("请选择离世时间！").css("display", "inline-block");
+                    } else {
+                        $("label#deathDate-error").text("").css("display", "none");
+                    }
+                } else {
+                    $("input[name='deathDate']").val("");
+                    $("label#deathDate-error").text("").css("display", "none");
+                }
+
+                if (flag) {
+                    var fd = new FormData($("form#jibenxinxiForm")[0]);
+                    var jlqk = new FormData($("form#junlvshengyaForm")[0]);
+                    var qtxx = new FormData($("form#qitaxinxiForm")[0]);
+                    for (let item of jlqk.entries()) {
+                        fd.append(item[0], item[1]);
+                    }
+                    for (let item of qtxx.entries()) {
+                        fd.append(item[0], item[1]);
+                    }
+                    fd.append("seriousDisease", $("input[name='seriousDisease']").val());
+                    if ($("input[name='invalidismCommunal']").is(":checked")) {
+                        fd.append("invalidismCommunal", "1");
+                    } else {
+                        fd.append("invalidismCommunal", "0");
+                    }
+                    if ($("input[name='invalidismIllness']").is(":checked")) {
+                        fd.append("invalidismIllness", "1");
+                    } else {
+                        fd.append("invalidismIllness", "0");
+                    }
+                    if ($("input[name='invalidismWarfare']").is(":checked")) {
+                        fd.append("invalidismWarfare", "1");
+                    } else {
+                        fd.append("invalidismWarfare", "0");
+
+                        let warfare = "";
+                        $("span.current", $("p#canzhanqingkuang")).each(function (i, v) {
+                            warfare += $(this).data("val") + ",";
+                        })
+                        if (warfare) {
+                            warfare = warfare.substring(0, warfare.length - 1);
+                        }
+
+                        fd.append("warfare", warfare);
+
+                        let special = "";
+                        $("span.current", $("p#teshuqingkuang")).each(function (i, v) {
+                            special += $(this).data("val") + ",";
+                        })
+                        if (special) {
+                            special = special.substring(0, special.length - 1);
+                        }
+
+                        fd.append("special", special);
+
+                        $("span.current", $("p.filedSelectP")).each(function (i, v) {
+                            let filed = $(this).data("filed");
+                            fd.append(filed, "1");
+                            if (filed == "specialSubsidy") {
+                                fd.append("nurseStartDate", $("input[name='nurseStartDate']").val());
+                            }
+                        })
+
+
+                        let family = [];
+                        $("tbody tr", $("table#familyTable")).each(function (i, v) {
+                            let name = $("input[name='familyName']", $(this)).val();
+                            let phone = $("input[name='familyPhone']", $(this)).val();
+                            let jjlxr = $("input[name='familyJjlxr']:checked", $(this));
+                            let relation = $("select[name='familyRelation']", $(this)).val();
+                            if (jjlxr) {
+                                family.push({"name": name, "phone": phone, "jjlxr": "1", "relation": relation})
+                            } else {
+                                family.push({"name": name, "phone": phone, "jjlxr": "0", "relation": relation})
+                            }
+                        })
+                        fd.append("family", JSON.stringify(family));
+                        let liGong = [];
+                        $("tbody tr", $("table#liGongTable")).each(function (i, v) {
+                            let time = $("input[name='liGongTime']", $(this)).val();
+                            let other = $("input[name='liGongOther']", $(this)).val();
+                            let level = $("select[name='liGongLevel']", $(this)).val();
+                            liGong.push({"time": time, "other": other, "level": level})
+                        })
+                        fd.append("liGong", JSON.stringify(liGong));
+
+                        $.ajax({
+                            url: basePath + "/archives/save",
+                            type: "post",
+                            dataType: "json",
+                            data: fd,
+                            processData: false, // 使数据不做处理
+                            contentType: false, // 不要设置Content-Type请求头
+                            success: function (data) {
+                                console.log(data);
+                                if (data.code == 200) {
+                                    alert('上传成功！');
+                                }
+                            },
+                        })
+                    }
+                }
+            }
+        })
+
+        setTimeout(function () {
+                $("input[name='politicalAffiliation']").on("ifChanged",function (e) {
+                    let val = $("input[name='politicalAffiliation']:checked").val();
+                    let flag = true;
+                    if(flag && val == "2"){
+                        flag = false;
+                        $("li#joinpartyDateLi").css("display","flex");
+                    }else{
+                        $("li#joinpartyDateLi").css("display","none");
+                    }
+                    if(flag && val == "9"){
+                        $("li#politicalExplainLi").css("display","flex");
+                    }else{
+                        $("li#politicalExplainLi").css("display","none");
+                    }
+                })
+                $("input[name='aliveStatus']").on("ifChanged",function (e) {
+                    let val = $("input[name='aliveStatus']:checked").val();
+                    if(val == "1"){
+                        $("li#deathDateLi").css("display","none");
+                    }else{
+                        $("li#deathDateLi").css("display","flex");
+                    }
+                })
+                $("input[name='invalidismCommunal']").on("ifChanged",function (e) {
+                    if($(this).is(':checked')){
+                        $("select[name='invalidismCommunalLevel']").removeAttr("disabled");
+                    }else{
+                        $("select[name='invalidismCommunalLevel']").attr("disabled","disabled");
+                    }
+                })
+                $("input[name='invalidismIllness']").on("ifChanged",function (e) {
+                    if($(this).is(':checked')){
+                        $("select[name='invalidismIllnessLevel']").removeAttr("disabled");
+                    }else{
+                        $("select[name='invalidismIllnessLevel']").attr("disabled","disabled");
+                    }
+                })
+                $("input[name='invalidismWarfare']").on("ifChanged",function (e) {
+                    if($(this).is(':checked')){
+                        $("select[name='invalidismWarfareLevel']").removeAttr("disabled");
+                    }else{
+                        $("select[name='invalidismWarfareLevel']").attr("disabled","disabled");
+                    }
+                })
+            }
+            ,3000)
+    }
+
+    function get(id) {
+        $.ajax({
+            url:basePath+"/archives/get",
+            type:"post",
+            dataType:"json",
+            async:false,
+            data:{"id":id},
+            success:function (result) {
+                if(result.code == 200){
+                    let archives = result.data.archives;
+                    let cList = result.data.cList;
+                    let fList = result.data.fList;
+                    let sList = result.data.sList;
+                    let wList = result.data.wList;
+                    for(let key in archives) {
+                        if(archives[key]) {
+                            if (key != "politicalAffiliation" && key != "aliveStatus") {
+                                if ($("[name='" + key + "']").hasClass("record-time")) {
+                                    $("[name='" + key + "']").val(getDate(archives[key].time).Format("yyyy-MM-dd"));
+                                } else {
+                                    $("[name='" + key + "']").val(archives[key]);
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    layer.msg(result.msg);
+                }
+            }
+        })
+    }
+
+
+    function getDate(time){
+        let len = (""+time).length;
+        if(len <= 10){
+            return new Date(parseInt(time) * 1000);
+        }else if(len <= 13){
+            return new Date(parseInt(time));
+        }
+    }
+
+    Date.prototype.Format = function (fmt) {
+        let o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (let k in o){
+            if (new RegExp("(" + k + ")").test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+</script>
+</body>
+</html>

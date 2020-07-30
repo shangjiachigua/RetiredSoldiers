@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caifu.mapper.JxJournalismMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caifu.pojo.JxJournalism">
+        <id column="ID" property="id"/>
+        <result column="CREATE_BY" property="createBy"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_BY" property="updateBy"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
+        <result column="TITLE" property="title"/>
+        <result column="BRIEF_INTRODUCTION" property="briefIntroduction"/>
+        <result column="CONTENT" property="content"/>
+        <result column="IMG_URL" property="imgUrl"/>
+        <result column="TOP_IMG_URL" property="topImgUrl"/>
+        <result column="IS_TOP" property="isTop"/>
+        <result column="STATUS" property="status"/>
+        <result column="BROWSE_NUMBER" property="browseNumber"/>
+        <result column="TYPE" property="type"/>
+        <result column="URL" property="url"/>
+    </resultMap>
+
+    <resultMap id="newsMap" type="com.caifu.dto.JxJournalismDto">
+        <id column="ID" property="id"/>
+        <result column="TITLE" property="title"/>
+        <result column="BROWSE_NUMBER" property="browseNumber"/>
+        <result column="countNum" property="niceNumber"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="IS_TOP" property="isTop"/>
+    </resultMap>
+
+    <select id="selectJxJournalismList" resultMap="newsMap" parameterType="map">
+        SELECT jxj.TITLE,jxj.BROWSE_NUMBER,IFNULL(countTable.countNum,0) countNum,jxj.CREATE_TIME,jxj.ID,jxj.IS_TOP
+        FROM jx_journalism jxj LEFT JOIN (SELECT COUNT(0) countNum,JOURNALISM_ID FROM jx_journalism_commend GROUP BY
+        jx_journalism_commend.JOURNALISM_ID)
+        countTable on jxj.ID = countTable.JOURNALISM_ID
+        where 1=1 and jxj.status = 1
+        <if test="title!=null and title !='' ">
+            and jxj.TITLE like CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR}),'%')
+        </if>
+        <if test="isTop!=null and isTop !='' ">
+            and jxj.IS_TOP = #{isTop}
+        </if>
+        order by jxj.CREATE_TIME desc
+    </select>
+
+
+</mapper>

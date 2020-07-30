@@ -1,0 +1,22 @@
+@charset "utf-8";
+body,html{width:100%; min-width:1200px; background-color:#F0EFF5; color:#323232}
+
+.left-sidebar{ background-color:#2B3647; position: fixed; top:90px; left:0; bottom: 0; width:15%; height: 100%; z-index:6; overflow: hidden; }
+.left-sidebar-con{ margin-right: -20px; height: 100%; overflow: hidden; overflow-y: scroll; }
+/*.left-sidebar-con article p{ border-bottom:1px solid #ececec; padding:15px 25px;}*/
+.left-sidebar-con dl a{ display: block; font-size: 18px; height:80px; line-height:80px; }
+.left-sidebar-con dt a{ color:#A3ADC1; padding-left:10px; font-weight: bold; letter-spacing: 2px; overflow: hidden; }
+.left-sidebar-con dl dt img{ width: 20px; vertical-align: -5px;}
+.left-sidebar-con dt i{ color:#A3ADC1; font-size:22px; }
+.left-sidebar-con dt i,.left-sidebar-con dt span{ float:left; margin-left:20px; }
+.left-sidebar-con dl li a{ color:#A3ADC1; background-color: #222B3A; padding-left:100px; position: relative }
+.left-sidebar-con dl li a.current{ background-color:#141B27; color:#fff; text-decoration: none; }
+/*.left-sidebar-con dl li a.current::after{
+	content: '';
+	display: block;
+	border-left:3px solid #356aff;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+}*/

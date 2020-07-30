@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/normalize.css'"/>
+    <link rel="stylesheet" type="text/css" th:href="${#request.getContextPath()}+'/static/css/login.css'"/>
+    <base th:href="${#request.getContextPath()}">
+    <style type="text/css">
+    </style>
+</head>
+<body>
+<section class="login">
+    <div class="relative textCenter">
+        <dl>
+            <dt><img th:src="${#request.getContextPath()}+'/static/img/logo.png'"></dt>
+            <dd class="mt40px fb">徐汇军休中心信息管理系统</dd>
+        </dl>
+    </div>
+    <div class="bgWhite">
+        <form action="" method="post">
+            <h1 class="fb mb50px">请登录</h1>
+            <ul>
+                <li><input type="text" id="userName" placeholder="请输入登录账号" autocomplete="off" /></li>
+                <li><input type="password" id="passWord" placeholder="请输入登录密码" /></li>
+                <p class="pt30px"><span class="block textCenter white border-radius5 lh60px fb f18px" id="loginButton" style="cursor: pointer">登录</span></p>
+            </ul>
+        </form>
+    </div>
+</section>
+<script th:src="${#request.getContextPath()}+'/static/js/jquery-2.1.3.min.js'" charset="utf-8"></script>
+<script th:src="${#request.getContextPath()}+'/static/layer/layer.js'" charset="utf-8"></script>
+<script th:inline="javascript">
+    var basePath = [[${#request.getContextPath()}]];
+   /* layer.config({
+        extend:'style.css',
+        skin: 'layui-layer-cool-black'
+    });*/
+    $(function (e) {
+        document.onkeydown = function (e) {
+            var theEvent = window.event || e;
+            var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+            if (code == 13) {
+                login();
+            }
+        }
+
+        $("span#loginButton").on("click",function (e) {
+            login();
+        })
+    })
+
+    function login() {
+        var loginName = $("input#userName").val();
+        var passWord = $("input#passWord").val();
+        var flag = true;
+        if(!loginName){
+            flag = false;
+            /*layer.open({
+                type: 1,
+                skin: 'layui-layer-cool-black', //样式类名
+                closeBtn: 0, //不显示关闭按钮
+                anim: 2,
+                area: ['360px', '180px'],
+                shadeClose: true, //开启遮罩关闭
+                content: '<div>登录账号不能为空！</div>',
+                btn:["确定"]
+            });*/
+            layer.msg('登录账号不能为空！');
+        }else if(!passWord){
+            flag = false;
+            /*layer.open({
+                type: 1,
+                skin: 'layui-layer-cool-black', //样式类名
+                closeBtn: 0, //不显示关闭按钮
+                anim: 2,
+                area: ['360px', '180px'],
+                shadeClose: true, //开启遮罩关闭
+                content: '<div>登录密码不能为空！</div>',
+                btn:["确定"]
+            });*/
+            layer.msg('登录密码不能为空！');
+        }
+        if(flag) {
+            $.ajax({
+                url: basePath + "/authentication",
+                type: "post",
+                dataType: "json",
+                data: {"loginName": loginName, "password": passWord},
+                success: function (result) {
+                    if (result.code == "200" || result.code == 200) {
+                        window.location.href = basePath + "/index";
+                    }else{
+                        /*layer.open({
+                            type: 1,
+                            skin: 'layui-layer-cool-black', //样式类名
+                            closeBtn: 0, //不显示关闭按钮
+                            anim: 2,
+                            area: ['360px', '180px'],
+                            shadeClose: true, //开启遮罩关闭
+                            content: "<div>"+result.msg+"</div>",
+                            btn:["确定"]
+                        });*/
+                        layer.msg(result.msg);
+                    }
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>
+
+
